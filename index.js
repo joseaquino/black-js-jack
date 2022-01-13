@@ -1,3 +1,4 @@
+
 "use strict";
 const mainContainer = document.querySelector("#app");
 const listOfCards = document.querySelector("#lista");
@@ -74,3 +75,4 @@ const barajear = function () {
 };
 
 shuffle.addEventListener("click", barajear);
+
