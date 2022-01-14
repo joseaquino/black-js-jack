@@ -1,31 +1,53 @@
-
 "use strict";
-const mainContainer = document.querySelector("#app");
 const listOfCards = document.querySelector("#lista");
 const shuffle = document.querySelector(".shuffle");
 const topCard = document.querySelector("#top-card");
 
-const cardsArr = [];
-const clubs = ["clubs", "diamonds", "hearts", "spades"];
-const cards = ["As", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
-
 //GENERANDO ARRAY CON CARTAS
-for (let i = 0; i < 4; i++) {
-  for (let j = 0; j < 13; j++) {
-    let cardObj = {
-      suit: clubs[i],
-      number: cards[j],
-      color: clubs[i] === "hearts" || clubs[i] === "spades" ? "red" : "black",
-    };
 
-    cardsArr.push(cardObj);
+const cardGeneration = function () {
+  const cardsArrGen = [];
+  const clubs = ["clubs", "diamonds", "hearts", "spades"];
+  const cards = ["As", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
+
+  for (let i = 0; i < 4; i++) {
+    for (let j = 0; j < 13; j++) {
+      const cardObj = {
+        suit: clubs[i],
+        number: cards[j],
+        color: clubs[i] === "hearts" || clubs[i] === "spades" ? "red" : "black",
+      };
+
+      switch (cardObj.suit) {
+        case "clubs":
+          cardObj.icon = "fab fa-canadian-maple-leaf";
+          break;
+        case "diamonds":
+          cardObj.icon = "fas fa-gem";
+          break;
+        case "hearts":
+          cardObj.icon = "fas fa-heart";
+          break;
+        case "spades":
+          cardObj.icon = "fas fa-candy-cane";
+          break;
+      }
+
+      cardsArrGen.push(cardObj);
+    }
   }
-}
+  return cardsArrGen;
+};
+
+const cardsArr = cardGeneration();
+console.log(cardsArr);
 
 //FUNCION PARA REVOLVER CARTAS
 
 const revolver = function (arr) {
-  let largo = arr.length;
+  const arrCopy = arr.slice();
+
+  let largo = arrCopy.length;
   let indexAleatorio;
 
   while (largo !== 0) {
@@ -34,45 +56,44 @@ const revolver = function (arr) {
     largo--;
 
     //cambiando ultimo numero con indice aleatorio
+    let temp = arrCopy[largo];
+    arrCopy[largo] = arrCopy[indexAleatorio];
+    arrCopy[indexAleatorio] = temp;
 
-    [arr[largo], arr[indexAleatorio]] = [arr[indexAleatorio], arr[largo]];
+    // [arrCopy[largo], arrCopy[indexAleatorio]] = [
+    //   arrCopy[indexAleatorio],
+    //   arrCopy[largo],
+    // ];
   }
-  return arr;
+  return arrCopy;
+};
+
+const renderCards = function (arr) {
+  let htmlString = "";
+
+  arr.forEach((card) => {
+    htmlString += `<p>${card.number} of ${card.suit} <i class="${card.icon}"></i></p>`;
+  });
+
+  return htmlString;
 };
 
 const barajear = function () {
+  listOfCards.innerHTML = "";
   const cardsArrRevuelto = revolver(cardsArr);
-
-  let cardsListHtmlString = "";
-  let icon;
-
-  cardsArrRevuelto.forEach((card) => {
-    switch (card.suit) {
-      case "clubs":
-        icon = "fab fa-canadian-maple-leaf";
-        break;
-      case "diamonds":
-        icon = "fas fa-gem";
-        break;
-      case "hearts":
-        icon = "fas fa-heart";
-        break;
-      case "spades":
-        icon = "fas fa-candy-cane";
-        break;
-    }
-
-    return (cardsListHtmlString += `<p>${card.number} of ${card.suit} <i class="${icon}"></i></p>`);
-  });
-
+  const cardsListHtmlString = renderCards(cardsArrRevuelto);
   listOfCards.insertAdjacentHTML("afterbegin", cardsListHtmlString);
-  topCard.innerHTML = `<p>${cardsArrRevuelto[0].number} of ${cardsArrRevuelto[0].suit} `;
-  topCard.style.backgroundColor =
-    cardsArrRevuelto[0].suit === "hearts" ||
-    cardsArrRevuelto[0].suit === "spades"
-      ? "red"
-      : "grey";
+
+  //
+  topCard.innerHTML = renderCards([cardsArrRevuelto[0]]);
+
+  topCard.classList.remove("grey");
+  topCard.classList.remove("pink");
+
+  cardsArrRevuelto[0].suit === "hearts" ||
+  cardsArrRevuelto[0].suit === "diamonds"
+    ? topCard.classList.add("pink")
+    : topCard.classList.add("grey");
 };
 
 shuffle.addEventListener("click", barajear);
-
