@@ -8,13 +8,12 @@
 
 html {
   box-sizing: border-box;
-  font-size: 62.5%;
+  font-size: 62.5%; /*  // Setting the page base font to 10px to simplify `rem` calculations by making them a multiple of 10 */
 }
 
 .container {
   display: flex;
   justify-content: center;
-
   gap: 5rem;
 }
 
@@ -25,15 +24,11 @@ body {
   line-height: 1.6;
 }
 
-.fa-heart {
-  color: red;
-}
-.fa-canadian-maple-leaf {
-  color: black;
-}
+.fa-heart,
 .fa-gem {
   color: red;
 }
+.fa-canadian-maple-leaf,
 .fa-candy-cane {
   color: black;
 }
@@ -70,7 +65,7 @@ body {
   border: 2px solid blue;
   padding: 7rem 3rem;
   border-radius: 11px;
-  color: white;
+  color: black;
   font-size: 2rem;
 }
 
