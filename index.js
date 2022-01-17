@@ -1,4 +1,52 @@
 "use strict";
+
+import { cardGeneration } from "./Deck.js";
+import Mix from "./Mix.js";
+import Player from "./Player.js";
+import distribuite from "./Distribue.js";
+
+const start = document.querySelector("#start");
+
+class Board {
+  constructor() {
+    this.deck = cardGeneration(); //Generates deck of cards
+    this.mixedDeck = Mix(this.deck); // Mixes deck of cards
+    this.players = [];
+  }
+}
+
+function InitiateGame() {
+  //Creating a Board instance
+  const game1 = new Board();
+
+  //Creating Player1
+  const player1 = new Player("Periquito", 5000);
+  //Storing player1 inside players array
+  game1.players.push(player1);
+
+  //Creating Dealer MUST BE CREATER ALWAYS AT LAST
+  const dealer = new Player("dealer", 20000);
+  //Storing dealer inside players array
+  game1.players.push(dealer);
+
+  //Function to initiate cards distribution when pressing 'start'
+  const startDistribution = () => {
+    distribuite(game1.mixedDeck, game1.players);
+    start.removeEventListener("click", startDistribution);
+  };
+
+  start.addEventListener("click", startDistribution);
+}
+
+InitiateGame();
+
+//
+// if (game1.players[0].hand.length === 2)
+//   start.removeEventListener("click", () => {
+//     distribuite(boardDeckMixed, game1.players);
+//   });
+
+/*
 const listOfCards = document.querySelector("#list");
 const shuffleBtn = document.querySelector(".shuffle");
 const topCard = document.querySelector("#top-card");
@@ -94,3 +142,4 @@ const shuffleFunction = function () {
 };
 
 shuffleBtn.addEventListener("click", shuffleFunction);
+*/

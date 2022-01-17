@@ -11,6 +11,73 @@ html {
   font-size: 62.5%; /*  // Setting the page base font to 10px to simplify `rem` calculations by making them a multiple of 10 */
 }
 
+body {
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  line-height: 1.7;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 7rem;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.header {
+  font-size: 4rem;
+  text-transform: uppercase;
+}
+
+.players-container {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.player-heading {
+  font-size: 2rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid black;
+  border-radius: 4px;
+  padding: 4.7rem 1.5rem;
+  min-width: 10rem;
+}
+
+.btn {
+  text-transform: uppercase;
+  padding: 1.5rem 4rem;
+  display: inline-block;
+  border-radius: 10px;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  background-color: #555;
+  color: white;
+}
+
+.btn:hover {
+  background-color: #fff;
+  color: #555;
+  border: 1px solid #555;
+}
+
+.btn:active {
+  transform: translateY(-3px);
+}
+/*
 .container {
   display: flex;
   justify-content: center;
@@ -76,3 +143,4 @@ body {
 .grey {
   background-color: grey;
 }
+*/
