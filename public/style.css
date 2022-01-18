@@ -35,6 +35,11 @@ body {
   gap: 3rem;
 }
 
+.players {
+  display: flex;
+  gap: 5rem;
+}
+
 .player {
   display: flex;
   flex-direction: column;
@@ -50,7 +55,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 2px solid black;
+  border: 2px solid hsl(0, 0%, 0%);
   border-radius: 4px;
   padding: 4.7rem 1.5rem;
   min-width: 10rem;
@@ -64,83 +69,17 @@ body {
   transition: all 0.2s;
   border: none;
   cursor: pointer;
-  background-color: #555;
-  color: white;
+  border: 1px transparent;
+  background-color: hsl(0, 0%, 33%);
+  color: hsl(0, 0%, 100%);
 }
 
 .btn:hover {
-  background-color: #fff;
-  color: #555;
-  border: 1px solid #555;
+  background-color: hsl(0, 0%, 100%);
+  color: hsl(0, 0%, 33%);
+  border: 1px solid hsl(0, 0%, 33%);
 }
 
 .btn:active {
   transform: translateY(-3px);
 }
-/*
-.container {
-  display: flex;
-  justify-content: center;
-  gap: 5rem;
-}
-
-body {
-  font-family: sans-serif;
-  color: grey;
-  font-weight: 300;
-  line-height: 1.6;
-}
-
-.fa-heart,
-.fa-gem {
-  color: red;
-}
-.fa-canadian-maple-leaf,
-.fa-candy-cane {
-  color: black;
-}
-
-.shuffle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  padding: 0.5rem;
-  background-color: hsl(229, 100%, 75%);
-  height: 8rem;
-  width: 16rem;
-  border-radius: 11px;
-  margin-top: 2rem;
-  color: Black;
-  font-size: 2rem;
-  text-transform: uppercase;
-}
-
-.shuffle {
-  transition: all 0.05s;
-  border: none;
-}
-
-.shuffle:active {
-  transform: translateY(-3px);
-  background-color: red;
-  border: 2px solid black;
-  color: white;
-}
-
-#top-card {
-  border: 2px solid blue;
-  padding: 7rem 3rem;
-  border-radius: 11px;
-  color: black;
-  font-size: 2rem;
-}
-
-.pink {
-  background-color: pink;
-}
-
-.grey {
-  background-color: grey;
-}
-*/

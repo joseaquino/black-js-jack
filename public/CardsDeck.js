@@ -1,11 +1,12 @@
-class Card {
+"use strict";
+export default class CardsDeck {
   faceDirection = "up";
 
   constructor(suit, number) {
     this.suit = suit;
     this.number = number;
     this.color = suit === "hearts" || suit === "spades" ? "red" : "black";
-    this.selectCardIcon()
+    this.selectCardIcon();
   }
 
   selectCardIcon() {
@@ -27,28 +28,9 @@ class Card {
 
   flipCard() {
     if (this.faceDirection === "up") {
-      this.faceDirection = "down"
+      this.faceDirection = "down";
     } else {
-      this.faceDirection = "up"
+      this.faceDirection = "up";
     }
   }
 }
-
-function cardGeneration() {
-  const cardsArrGen = [];
-  const clubs = ["clubs", "diamonds", "hearts", "spades"];
-  const cards = ["As", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
-
-  const cardsClubs = clubs.length;
-  const differentCards = cards.length;
-
-  for (let i = 0; i < cardsClubs; i++) {
-    for (let j = 0; j < differentCards; j++) {
-      const card = new Card(clubs[i], cards[j])
-      cardsArrGen.push(card);
-    }
-  }
-  return cardsArrGen;
-}
-
-export { cardGeneration };
