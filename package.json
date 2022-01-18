@@ -1,0 +1,24 @@
+{
+  "name": "black-js-jack",
+  "version": "1.0.0",
+  "description": "A blackjack game written in Javascript",
+  "main": "server/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joseaquino/black-js-jack.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joseaquino/black-js-jack/issues"
+  },
+  "homepage": "https://github.com/joseaquino/black-js-jack#readme",
+  "dependencies": {
+    "express": "^4.17.2"
+  }
+}

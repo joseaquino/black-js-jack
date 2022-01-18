@@ -20,11 +20,14 @@ export default function distribuite(cardsArr, playersArr) {
   async function givingCards() {
     for (let i = 0; i < cardsToGive; i++) {
       let card = cardsArr.slice(i, i + 1);
-      playersArr[playerToGetCard].hand.push(card);
+      const currentPlayerBeingDealt = playersArr[playerToGetCard]
+
       if (i === cardsToGive - 1) {
-        const lastDealerCardIndex = playersArr[playerToGetCard].hand.length - 1;
-        playersArr[playerToGetCard].hand[lastDealerCardIndex][0].face = "down";
+        card.flipCard()
       }
+
+      currentPlayerBeingDealt.receiveCard(card);
+
       cardsPlace[cardToRender].insertAdjacentHTML(
         "afterbegin",
         renderCards(card)

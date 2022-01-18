@@ -7,11 +7,28 @@ import distribuite from "./Distribue.js";
 
 const start = document.querySelector("#start");
 
+// TODO: Extract this class to its own file
 class Board {
   constructor() {
     this.deck = cardGeneration(); //Generates deck of cards
     this.mixedDeck = Mix(this.deck); // Mixes deck of cards
     this.players = [];
+  }
+
+  addPlayer(player) {
+    this.players.push(player)
+  }
+
+  getPlayers() {
+    return this.players;
+  }
+
+  dealCards() {
+    // TODO: Add logic for dealing cards to the players that have been added
+  }
+
+  renderPlayers() {
+    // TODO: Add logic for rendering the each player to the DOM
   }
 }
 
@@ -20,18 +37,20 @@ function InitiateGame() {
   const game1 = new Board();
 
   //Creating Player1
-  const player1 = new Player("Periquito", 5000);
+  const player1 = new Player("Periquito", 5000, 'GuestPlayer');
   //Storing player1 inside players array
-  game1.players.push(player1);
+  game1.addPlayer(player1);
 
   //Creating Dealer MUST BE CREATER ALWAYS AT LAST
-  const dealer = new Player("dealer", 20000);
+  const dealer = new Player("dealer", 20000, 'Dealer');
+  dealer.setDomElement(document.querySelector("#dealer"))
   //Storing dealer inside players array
-  game1.players.push(dealer);
+  game1.addPlayer(dealer);
 
   //Function to initiate cards distribution when pressing 'start'
   const startDistribution = () => {
     distribuite(game1.mixedDeck, game1.players);
+    game1.getPlayers().forEach((player) => player.render())
     start.removeEventListener("click", startDistribution);
   };
 
