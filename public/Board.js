@@ -48,7 +48,7 @@ export default class Board {
 
   dealerCreation() {
     const dealer = new Player("Dealer", 2000000, "Dealer");
-    dealer.setDomElement("Dealer");
+    dealer.renderPlayerHtml('.dealer')
     //Storing player1 inside players array
     this.addPlayer(dealer);
   }
@@ -68,16 +68,16 @@ export default class Board {
     for (let i = 0; i < cardsToGive; i++) {
       let playerToGetCard = (i + amountOfPlayers) % amountOfPlayers;
 
-      let card = cardsArr.slice(i, i + 1);
+      let [card] = cardsArr.slice(i, i + 1);
 
       const currentPlayerBeingDealt = playersArr[playerToGetCard];
 
       if (i === cardsToGive - 1) {
-        card[0].flipCard();
+        card.flipCard();
       }
 
       currentPlayerBeingDealt.receiveCard(card);
-      currentPlayerBeingDealt.renderCards(card);
+      currentPlayerBeingDealt.renderNextCard();
 
       await sleepNow(1000);
     }

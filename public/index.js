@@ -10,16 +10,19 @@ function InitiateGame() {
 
   //Creating Player1
   const player1 = new Player("Periquito", 5000, "GuestPlayer");
-  player1.renderPlayerHtml("Periquito");
-  player1.setDomElement("Periquito");
+  player1.renderPlayerHtml('.players');
   //Storing player1 inside players array
   game1.addPlayer(player1);
 
   const player2 = new Player("Javiles", 5000, "GuestPlayer");
-  player2.renderPlayerHtml("Javiles");
-  player2.setDomElement("Javiles");
+  player2.renderPlayerHtml('.players');
   //Storing player2 inside players array
   game1.addPlayer(player2);
+
+  const player3 = new Player("John", 5000, "GuestPlayer");
+  player3.renderPlayerHtml('.players');
+  //Storing player2 inside players array
+  game1.addPlayer(player3);
 
   //DEALER CANNOT BE MODIFIED  AND ALWAYS HAS TO BE CREATED AT THE END
   game1.dealerCreation();
