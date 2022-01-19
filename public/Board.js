@@ -1,12 +1,12 @@
 "use strict";
 import { sleepNow } from "./Helpers.js";
-import CardsDeck from "./CardsDeck.js";
+import Card from "./Card.js";
 import Player from "./Player.js";
 
 export default class Board {
   constructor() {
     this.deck = this.cardGeneration(); //Generates deck of cards
-    this.mixedDeck = this.mix(this.deck); // Mixes deck of cards
+    this.shuffledDeck = this.shuffle(this.deck); // Shuffle deck of cards
     this.players = [];
   }
 
@@ -20,14 +20,14 @@ export default class Board {
 
     for (let i = 0; i < cardsClubs; i++) {
       for (let j = 0; j < differentCards; j++) {
-        const card = new CardsDeck(clubs[i], cards[j]);
+        const card = new Card(clubs[i], cards[j]);
         cardsArrGen.push(card);
       }
     }
     return cardsArrGen;
   }
 
-  mix(arr) {
+  shuffle(arr) {
     const arrCopy = [...arr];
 
     let totalOfElements = arrCopy.length;
@@ -48,7 +48,7 @@ export default class Board {
 
   dealerCreation() {
     const dealer = new Player("Dealer", 2000000, "Dealer");
-    dealer.renderPlayerHtml('.dealer')
+    dealer.renderPlayerHtml(".dealer");
     //Storing player1 inside players array
     this.addPlayer(dealer);
   }
@@ -57,27 +57,22 @@ export default class Board {
     this.players.push(player);
   }
 
-  getPlayers() {
-    return this.players;
-  }
-
-  async dealCards(cardsArr, playersArr) {
-    const amountOfPlayers = playersArr.length;
+  async dealCards() {
+    const amountOfPlayers = this.players.length;
     const cardsToGive = 2 * amountOfPlayers;
 
     for (let i = 0; i < cardsToGive; i++) {
       let playerToGetCard = (i + amountOfPlayers) % amountOfPlayers;
 
-      let [card] = cardsArr.slice(i, i + 1);
+      let [card] = this.shuffledDeck.slice(i, i + 1);
 
-      const currentPlayerBeingDealt = playersArr[playerToGetCard];
+      const currentPlayerBeingDealt = this.players[playerToGetCard];
 
       if (i === cardsToGive - 1) {
         card.flipCard();
       }
 
       currentPlayerBeingDealt.receiveCard(card);
-      currentPlayerBeingDealt.renderNextCard();
 
       await sleepNow(1000);
     }

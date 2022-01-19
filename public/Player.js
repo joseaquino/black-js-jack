@@ -12,6 +12,10 @@ export default class Player {
     this.nextCardToRender = 0;
   }
 
+  renderPlayer() {
+    this.renderPlayerHtml(".players");
+  }
+
   renderPlayerHtml(containerElement) {
     if (this.domElement) return;
 
@@ -27,10 +31,11 @@ export default class Player {
 
   receiveCard(card) {
     this.hand.push(card);
+    this.renderNextCard();
   }
 
   renderNextCard() {
-    if (this.nextCardToRender > this.hand.length) return
+    if (this.nextCardToRender > this.hand.length - 1) return;
 
     let htmlString = "";
 
@@ -42,7 +47,7 @@ export default class Player {
       htmlString += `<p>${cardToRender.number} of ${cardToRender.suit} <i class="${cardToRender.icon}  "></i></p>`;
     }
 
-    const cardContainerElem = this.domElement.querySelector(".card")
+    const cardContainerElem = this.domElement.querySelector(".card");
 
     cardContainerElem.insertAdjacentHTML("afterbegin", htmlString);
 

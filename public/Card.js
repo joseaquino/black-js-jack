@@ -1,5 +1,5 @@
 "use strict";
-export default class CardsDeck {
+export default class Card {
   faceDirection = "up";
 
   constructor(suit, number) {

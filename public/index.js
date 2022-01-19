@@ -10,34 +10,29 @@ function InitiateGame() {
 
   //Creating Player1
   const player1 = new Player("Periquito", 5000, "GuestPlayer");
-  player1.renderPlayerHtml('.players');
+  player1.renderPlayer();
+
   //Storing player1 inside players array
   game1.addPlayer(player1);
 
   const player2 = new Player("Javiles", 5000, "GuestPlayer");
-  player2.renderPlayerHtml('.players');
+  player2.renderPlayer();
+
   //Storing player2 inside players array
   game1.addPlayer(player2);
 
   const player3 = new Player("John", 5000, "GuestPlayer");
-  player3.renderPlayerHtml('.players');
+  player3.renderPlayer();
+
   //Storing player2 inside players array
   game1.addPlayer(player3);
 
   //DEALER CANNOT BE MODIFIED  AND ALWAYS HAS TO BE CREATED AT THE END
   game1.dealerCreation();
 
-  //LEAVING THIS JUST AS TEMPORARY REFERENCE
-  // //Creating Dealer MUST BE CREATER ALWAYS AT LAST
-  // const dealer = new Player("Dealer", 20000, "Dealer");
-  // dealer.setDomElement("Dealer");
-  // //Storing player1 inside players array
-  // game1.addPlayer(dealer);
-
   //Function to initiate cards distribution when pressing 'start'
   const startDistribution = () => {
-    game1.dealCards(game1.mixedDeck, game1.players);
-    game1.getPlayers().forEach((player) => player.render());
+    game1.dealCards();
     start.removeEventListener("click", startDistribution);
   };
 
