@@ -19,10 +19,42 @@
         <div class="dealer"></div>
         <div class="players"></div>
       </div>
-      <div class="controls">
-        <button type="button" class="btn" id="start">Start</button>
-      </div>
     </div>
+
+    <div class="modal">
+      <h2 class="modal__header">
+        Add at least one player to start a new game!
+      </h2>
+      <form class="modal__form" id="modal__form">
+        <div class="btn-container">
+          <button type="button" class="btn btn-add" id="remove">
+            <i class="fas fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-remove" id="add">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+
+        <div class="modal-player-container" id="modal__playerCont">
+          <!-- LEAVING THIS JUST AS TEMPORARY REFERENCE -->
+          <!-- <div class="modal-player" id="P1">
+            <label>Payer 1</label>
+            <input
+              type="text"
+              minlength="4"
+              maxlength="12"
+              placeholder="NoobMaster69"
+              required
+              ;
+            />
+          </div> -->
+        </div>
+
+        <button type="submit" class="btn">Start</button>
+      </form>
+    </div>
+
+    <div class="overlay"></div>
 
     <script
       src="https://kit.fontawesome.com/c86810451e.js"
