@@ -27,8 +27,6 @@ const start = function (e) {
   //disbling possibilite of clicking more than once
   playersForm.removeEventListener("submit", start);
 
-  console.log(playersNames);
-
   const game1 = new Board();
 
   if (amountOfPlayers > 0) {
@@ -115,7 +113,6 @@ const addPlayer = function () {
     .querySelector(`input`);
   //adding event listener to capture player name
   inputEl.addEventListener("change", (e) => {
-    console.log("changeeee");
     playersNames.push(e.target.value);
   });
 
