@@ -4,7 +4,7 @@
 export default class Player {
   domElement = null;
 
-  constructor(name, pot, playerType) {
+  constructor(name, pot = 5000, playerType = "GuestPlayer") {
     this.hand = [];
     this.name = name;
     this.pot = pot;

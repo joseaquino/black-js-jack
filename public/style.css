@@ -61,6 +61,12 @@ body {
   min-width: 10rem;
 }
 
+.btn-container {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+}
+
 .btn {
   text-transform: uppercase;
   padding: 1.5rem 4rem;
@@ -82,4 +88,72 @@ body {
 
 .btn:active {
   transform: translateY(-3px);
+}
+
+.btn-add,
+.btn-remove {
+  border-radius: 50%;
+  padding: 1.2rem;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: hsla(106, 67%, 42%, 0.466);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  transition: all 0.5s;
+}
+
+.modal {
+  position: fixed;
+  border-radius: 11px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 60rem;
+  background-color: hsl(0, 0%, 100%);
+  padding: 5rem 6rem;
+  box-shadow: 0 4rem 6rem hsla(0, 0%, 0%, 0.3);
+  z-index: 1000;
+  transition: all 0.5s;
+}
+
+.modal__header {
+  font-size: 2.45rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.modal__form {
+  margin: 0 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  gap: 2.5rem;
+}
+
+.modal-player-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modal__form label {
+  font-size: 1.7rem;
+}
+
+.modal__form input {
+  font-size: 1.7rem;
+  padding: 1rem 1.5rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+}
+
+.hidden {
+  visibility: hidden;
+  opacity: 0;
 }
