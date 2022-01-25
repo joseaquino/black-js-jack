@@ -6,8 +6,8 @@ export default class WelcomeScreen {
     this.maxPlayersAllowed = 4;
   }
 
-  playersForm = document.querySelector("#modal__form");
-  modalPlayerCont = document.querySelector("#modal__playerCont");
+  playersForm = document.querySelector("#modal-form");
+  modalPlayerCont = document.querySelector("#modal-playerCont");
   btnAdd = document.querySelector("#add");
   btnRemove = document.querySelector("#remove");
   btnStart = document.querySelector("#start");

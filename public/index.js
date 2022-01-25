@@ -6,7 +6,7 @@ import WelcomeScreen from "./WelcomeScreen.js";
 
 const overlay = document.querySelector(".overlay");
 const modal = document.querySelector(".modal");
-const playersForm = document.querySelector("#modal__form");
+const playersForm = document.querySelector("#modal-form");
 
 //creando instancia de Board
 const game1 = new Board();
