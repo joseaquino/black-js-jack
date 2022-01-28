@@ -96,7 +96,7 @@ body {
   padding: 1.2rem;
 }
 
-.overlay {
+.modal__overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -136,7 +136,7 @@ body {
   gap: 2.5rem;
 }
 
-.modal-player-container {
+.modal-player-container li {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;

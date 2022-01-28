@@ -13,48 +13,13 @@
     <title>Black Jack Game</title>
   </head>
   <body>
-    <div class="container">
+    <div class="container" id="game">
       <h1 class="header">Black Jack</h1>
       <div class="players-container">
         <div class="dealer"></div>
         <div class="players"></div>
       </div>
     </div>
-
-    <div class="modal">
-      <h2 class="modal__header">
-        Add at least one player to start a new game!
-      </h2>
-      <form class="modal__form" id="modal-form">
-        <div class="btn-container">
-          <button type="button" disabled class="btn btn-remove" id="remove">
-            <i class="fas fa-minus"></i>
-          </button>
-          <button type="button" class="btn btn-add" id="add">
-            <i class="fas fa-plus"></i>
-          </button>
-        </div>
-
-        <div class="modal-player-container" id="modal-playerCont">
-          <!-- LEAVING THIS JUST AS TEMPORARY REFERENCE -->
-          <!-- <div class="modal-player" id="P1">
-            <label>Payer 1</label>
-            <input
-              type="text"
-              minlength="4"
-              maxlength="12"
-              placeholder="NoobMaster69"
-              required
-              ;
-            />
-          </div> -->
-        </div>
-
-        <button type="submit" class="btn" id="start" disabled>Start</button>
-      </form>
-    </div>
-
-    <div class="overlay"></div>
 
     <script
       src="https://kit.fontawesome.com/c86810451e.js"

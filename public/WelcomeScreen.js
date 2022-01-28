@@ -1,109 +1,205 @@
 "use strict";
+const MAX_AMOUNT_OF_PLAYERS = 4;
+
 export default class WelcomeScreen {
-  constructor() {
-    this.playersNames = [];
-    this.amountOfPlayers = 0;
-    this.maxPlayersAllowed = 4;
+  playersDefinition = [];
+  hasBeenRendered = false;
+
+  constructor(onStart) {
+    if (typeof onStart !== 'function') {
+      throw new Error(`You must provider a function callback to the WelcomeScreen constructor, provided type ${typeof onStart}`)
+    }
+    this.onStart = onStart;
+    const modalContainerElem = document.createElement('div')
+    modalContainerElem.classList.add('modal')
+    this.modalContainerElem = modalContainerElem;
+
+    const modalOverlay = document.createElement('div')
+    modalOverlay.classList.add('modal__overlay')
+    this.modalOverlayElem = modalOverlay;
+
+    this.modalContainerElem.innerHTML = this.modalHtml();
+
+    this.removePlayerBtnElem = this.modalContainerElem.querySelector('.btn-remove')
+    this.addPlayerBtnElem = this.modalContainerElem.querySelector('.btn-add')
+    this.playerListElem = this.modalContainerElem.querySelector('.modal-player-container')
+    this.playerFormElem = this.modalContainerElem.querySelector('.modal__form')
+    this.errorMessageElem = this.modalContainerElem.querySelector('.error-message')
+
+    this.removePlayerBtnElem.addEventListener('click', this.removePlayerField.bind(this))
+    this.addPlayerBtnElem.addEventListener('click', () => {
+      this.addPlayerField({ name: "" })
+    })
+    this.playerFormElem.addEventListener('submit', this.startGame.bind(this))
+    this.gameStartControlElem  = this.playerFormElem.querySelector('button[type="submit"]')
   }
 
-  playersForm = document.querySelector("#modal-form");
-  modalPlayerCont = document.querySelector("#modal-playerCont");
-  btnAdd = document.querySelector("#add");
-  btnRemove = document.querySelector("#remove");
-  btnStart = document.querySelector("#start");
-
-  //-----------------------------------------------------------START---------------------------------//
-
-  setPlayersNames(e) {
-    e.preventDefault();
-    this.btnStart.setAttribute("disabled", "true");
+  startGame() {
+    this.onStart(this.playersDefinition)
+    this.removeModalFromDocument()
   }
 
-  //------------------------------------ ADD PLAYER LOGIC----------------------------------------------//
+  removeModalFromDocument() {
+    this.modalContainerElem.remove()
+    this.modalOverlayElem.remove()
+    this.hasBeenRendered = false
+    this.playersDefinition = [];
+    const playerInputs = this.playerListElem.querySelector('ul')
+    playerInputs.innerHTML = ''
+  }
 
-  addPlayerField = function () {
-    const minCharactersAllowed = 4;
-    const maxCharactersAllowed = 12;
-    const playerIdPrefix = "P";
+  modalHtml() {
+    return `
+      <h2 class="modal__header">
+        Add at least one player to start a new game!
+      </h2>
+      <form class="modal__form">
+        <div class="btn-container">
+          <button type="button" disabled class="btn btn-remove">
+            <i class="fas fa-minus"></i>
+          </button>
+          <button type="button" class="btn btn-add">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
 
-    this.amountOfPlayers++;
+        <div class="modal-player-container">
+            <p class="error-message"></p>
+            <ul></ul>
+        </div>
 
-    this.amountOfPlayers > 0 ? this.btnRemove.removeAttribute("disabled") : "";
+        <button type="submit" class="btn" disabled>Start</button>
+      </form>
+    `
+  }
 
-    this.amountOfPlayers === this.maxPlayersAllowed
-      ? this.btnAdd.setAttribute("disabled", "true")
-      : "";
+  playerFieldHtml(playerIndex, initialValue) {
+    return `
+      <li id="player-${playerIndex}">
+        <label>Player ${playerIndex + 1}</label>
+        <input
+          type="text"
+          minlength="1"
+          placeholder="Enter player name like NoobMaster69"
+          ${initialValue ? `value="${initialValue}"` : ''}
+          required
+        />
+      </li>
+    `
+  }
 
-    //Creating string for element
-    const playerFieldHtmlString = `  <div class="modal-player" id="${playerIdPrefix}${this.amountOfPlayers}">
-  <label>Payer${this.amountOfPlayers}</label>
-  <input
-    type="text"
-    minlength="4"
-    maxlength="12"
-    placeholder="NoobMaster${this.amountOfPlayers}"
-    required
-  />
-</div>`;
+  togglePlayerControl(controlType, shouldDisable) {
+    let playerControl;
 
-    //selecting parent where we should insert html
-    this.modalPlayerCont.insertAdjacentHTML("beforeend", playerFieldHtmlString);
-    //selecting input element from player field
-    const inputEl = document.querySelector(
-      `.modal-player:nth-of-type(${this.amountOfPlayers}) input`
-    );
-
-    //adding event listener to capture player name
-
-    inputEl.addEventListener("change", (e) => {
-      //Each placeholder has the player position at the end
-      let playersNamesPosition = e.target.placeholder.slice(-1);
-
-      if (
-        e.target.value.length >= minCharactersAllowed &&
-        e.target.value.length <= maxCharactersAllowed
-      ) {
-        this.playersNames[playersNamesPosition - 1] = e.target.value;
-      }
-    });
-
-    //allowing start if there is a player
-    if (this.amountOfPlayers === 1) {
-      this.btnStart.removeAttribute("disabled");
+    switch (controlType) {
+      case "ADD":
+        playerControl = this.addPlayerBtnElem;
+        break;
+      case "REMOVE":
+        playerControl = this.removePlayerBtnElem;
+        break;
+      case "SUBMIT":
+        playerControl = this.gameStartControlElem;
+        break;
     }
+
+    if (!playerControl) {
+      throw new Error(`You must provide a valid control type of REMOVE, ADD or SUBMIT, provided ${controlType}`)
+    }
+
+    const isCurrentlyDisabled = playerControl.getAttribute('disabled');
+
+    if (isCurrentlyDisabled === null && shouldDisable) {
+      playerControl.setAttribute('disabled', 'true')
+    } else {
+      playerControl.removeAttribute('disabled')
+    }
+  }
+
+  getLastPlayer() {
+    return this.playersDefinition[this.playersDefinition.length - 1]
+  }
+
+  isPlayerValid(player) {
+    return player.name.trim() !== '';
+  }
+
+  hasMaxPlayersReached() {
+    return this.playersDefinition.length >= MAX_AMOUNT_OF_PLAYERS
+  }
+
+  areAllPlayersValid() {
+    if (this.playersDefinition.length === 0) return false;
+
+    const validPlayers = this.playersDefinition.filter(this.isPlayerValid)
+
+    return validPlayers.length === this.playersDefinition.length;
+  }
+
+  showErrorMessage(error) {
+    this.errorMessageElem.innerHTML = error
+  }
+
+  clearErrorMessage() {
+    this.errorMessageElem.innerHTML = ''
+  }
+
+  addPlayerField(newPlayer) {
+    const lastAddedPlayer = this.getLastPlayer()
+
+    if (this.hasBeenRendered && !this.isPlayerValid(lastAddedPlayer)) {
+      this.showErrorMessage('You must first add a name to the last created player')
+      return;
+    } else {
+      this.clearErrorMessage()
+    }
+
+    this.playersDefinition.push(newPlayer)
+    this.togglePlayerControl('ADD', this.hasMaxPlayersReached())
+    this.togglePlayerControl('REMOVE', this.playersDefinition.length === 0)
+    const newPlayerIndex = this.playersDefinition.length - 1;
+    const playerList = this.playerListElem.querySelector('ul')
+    playerList.insertAdjacentHTML('beforeend', this.playerFieldHtml(newPlayerIndex, newPlayer.name))
+    const playerInput = playerList.querySelector(`#player-${newPlayerIndex} input`)
+    playerInput.addEventListener('input', (event) => {
+      this.updatePlayer(newPlayerIndex, event.target.value)
+    })
   };
 
-  //----------------------------REMOVE PLAYER LOGIC---------------------------------------//
+  updatePlayer(playerIndex, playerName) {
+    const playerToEdit = this.playersDefinition[playerIndex]
 
-  removePlayerField = function () {
-    const lastPlayerField = this.modalPlayerCont.lastElementChild;
-
-    this.amountOfPlayers--;
-    if (this.amountOfPlayers === 0) {
-      this.btnRemove.setAttribute("disabled", "true");
-      this.btnStart.setAttribute("disabled", "true");
+    if (!playerToEdit) {
+      throw new Error('You are trying to edit a player that doesn\'t exist in the player definition array')
     }
-    this.amountOfPlayers < this.maxPlayersAllowed
-      ? this.btnAdd.removeAttribute("disabled")
-      : "";
-    lastPlayerField.remove();
-    //removing last players name when element is deleted
-    this.playersNames.splice(this.amountOfPlayers);
 
-    //disabling start because there are no players added
-    if (this.amountOfPlayers === 0) {
-      this.playersForm.setAttribute("disabled", "true");
-    }
+    this.playersDefinition[playerIndex] = {...playerToEdit, name: playerName};
+    this.togglePlayerControl('SUBMIT', !this.areAllPlayersValid())
+  }
+
+  removePlayerField() {
+    if (this.playersDefinition.length === 0) return;
+
+    const lastPlayerIndex = this.playersDefinition.length - 1
+    this.playersDefinition = this.playersDefinition.slice(0, lastPlayerIndex);
+
+    const lastPlayerElem = this.playerListElem.querySelector(`#player-${lastPlayerIndex}`)
+
+    if (lastPlayerElem) lastPlayerElem.remove()
+    this.clearErrorMessage()
+    this.togglePlayerControl('ADD', this.hasMaxPlayersReached())
+    this.togglePlayerControl('REMOVE', this.playersDefinition.length === 0)
+    this.togglePlayerControl('SUBMIT', !this.areAllPlayersValid())
   };
 
-  //--------------------------LISTENER TO ADD, REMOVE PLAYERS AND SUBMIT PLAYERS------------------------------//
+  render() {
+    if (this.hasBeenRendered) return;
 
-  enableWelcomeFunctionalities() {
-    this.btnAdd.addEventListener("click", this.addPlayerField.bind(this));
-    this.btnRemove.addEventListener("click", this.removePlayerField.bind(this));
-    this.playersForm.addEventListener(
-      "submit",
-      this.setPlayersNames.bind(this)
-    );
+
+    this.addPlayerField({ name: "" })
+    const bodyElem = document.querySelector('body')
+    bodyElem.append(this.modalContainerElem)
+    bodyElem.append(this.modalOverlayElem)
+    this.hasBeenRendered = true;
   }
 }
