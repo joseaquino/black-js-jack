@@ -19,7 +19,7 @@ body {
 .container {
   display: flex;
   flex-direction: column;
-  gap: 7rem;
+  gap: 1rem;
   align-items: center;
   margin-top: 1.5rem;
 }
@@ -156,4 +156,12 @@ body {
 .hidden {
   visibility: hidden;
   opacity: 0;
+}
+
+.error-message {
+  text-transform: uppercase;
+
+  display: inline-block;
+  background-color: red;
+  color: white;
 }
