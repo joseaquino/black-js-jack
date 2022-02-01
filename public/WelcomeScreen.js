@@ -39,14 +39,16 @@ export default class WelcomeScreen {
     this.addPlayerBtnElem.addEventListener("click", () => {
       this.addPlayerField({ name: "" });
     });
-    this.playerFormElem.addEventListener("submit", this.startGame.bind(this));
+    this.playerFormElem.addEventListener("submit", (e) => {
+      e.preventDefault();
+      this.startGame();
+    });
     this.gameStartControlElem = this.playerFormElem.querySelector(
       'button[type="submit"]'
     );
   }
 
-  startGame(e) {
-    e.preventDefault();
+  startGame() {
     this.onStart(this.playersDefinition);
     this.removeModalFromDocument();
   }
@@ -85,7 +87,7 @@ export default class WelcomeScreen {
     `;
   }
 
-  playerFieldHtml(playerIndex, initialValue) {
+  playerFieldHtml(playerIndex) {
     return `
       <li id="player-${playerIndex}">
         <label>Player ${playerIndex + 1}</label>
@@ -93,7 +95,6 @@ export default class WelcomeScreen {
           type="text"
           minlength="1"
           placeholder="Enter player name like NoobMaster69"
-          ${initialValue ? `value="${initialValue}"` : ""}
           required
         />
       </li>
