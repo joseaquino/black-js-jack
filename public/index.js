@@ -3,7 +3,6 @@ import Board from "./Board.js";
 import Player from "./Player.js";
 import WelcomeScreen from "./WelcomeScreen.js";
 import { sleepNow } from "./Helpers.js";
-import WelcomeScreen from "./WelcomeScreen.js";
 
 const start = () => {
   const container = document.querySelector("#game");
