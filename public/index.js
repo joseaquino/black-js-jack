@@ -17,8 +17,8 @@ const start = () => {
   restartBtn.innerHTML = "Choose new players";
 
   const welcomeScreen = new WelcomeScreen((players) => {
-    container.prepend(restartBtn);
     const game = new Board();
+    container.prepend(restartBtn);
     players.forEach((player) => game.addPlayer(new Player(player.name)));
 
     game.players.forEach((player) => {
@@ -32,15 +32,12 @@ const start = () => {
     };
 
     startDistribution();
-  });
 
-  restartBtn.addEventListener("click", () => {
-    const dealerCont = document.querySelector(".dealer");
-    const playersCont = document.querySelector(".players");
-    dealerCont.innerHTML = "";
-    playersCont.innerHTML = "";
-    welcomeScreen.render();
-    restartBtn.remove();
+    restartBtn.addEventListener("click", () => {
+      game.clearBoard();
+      welcomeScreen.render();
+      restartBtn.remove();
+    });
   });
 
   welcomeScreen.render();

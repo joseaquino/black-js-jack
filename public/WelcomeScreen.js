@@ -82,7 +82,7 @@ export default class WelcomeScreen {
             <ul></ul>
         </div>
 
-        <button type="submit" class="btn" disabled>Start</button>
+        <button type="submit" class="btn" >Start</button>
       </form>
     `;
   }
@@ -186,6 +186,8 @@ export default class WelcomeScreen {
     playerInput.addEventListener("input", (event) => {
       this.updatePlayer(newPlayerIndex, event.target.value);
     });
+
+    this.togglePlayerControl("SUBMIT", !this.areAllPlayersValid());
   }
 
   updatePlayer(playerIndex, playerName) {
