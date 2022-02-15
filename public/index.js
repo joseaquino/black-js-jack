@@ -1,42 +1,43 @@
 "use strict";
 import Board from "./Board.js";
 import Player from "./Player.js";
+import WelcomeScreen from "./WelcomeScreen.js";
+import { sleepNow } from "./Helpers.js";
 
-const start = document.querySelector("#start");
+const start = () => {
+  const container = document.querySelector("#game");
 
-function InitiateGame() {
-  //Creating a Board instance
-  const game1 = new Board();
+  if (!container) {
+    throw new Error(
+      "Container with ID game is missing in the document, make sure to include this in your index.html"
+    );
+  }
 
-  //Creating Player1
-  const player1 = new Player("Periquito", 5000, "GuestPlayer");
-  player1.renderPlayer();
+  const restartBtn = document.createElement("button");
+  restartBtn.innerHTML = "Choose new players";
 
-  //Storing player1 inside players array
-  game1.addPlayer(player1);
+  const welcomeScreen = new WelcomeScreen( async (players) => {
+    const game = new Board();
+    container.prepend(restartBtn);
+    players.forEach((player) => game.addPlayer(new Player(player.name)));
 
-  const player2 = new Player("Javiles", 5000, "GuestPlayer");
-  player2.renderPlayer();
+    game.players.forEach((player) => {
+      player.renderPlayer();
+    });
+    game.createDealer();
 
-  //Storing player2 inside players array
-  game1.addPlayer(player2);
+    // We will wait some time before dealing the cards to smooth out the transition between the welcome screen and the board
+    await sleepNow(1500);
+    await game.dealCards();
 
-  const player3 = new Player("John", 5000, "GuestPlayer");
-  player3.renderPlayer();
+    restartBtn.addEventListener("click", () => {
+      game.clearBoard();
+      welcomeScreen.render();
+      restartBtn.remove();
+    });
+  });
 
-  //Storing player2 inside players array
-  game1.addPlayer(player3);
+  welcomeScreen.render();
+};
 
-  //DEALER CANNOT BE MODIFIED  AND ALWAYS HAS TO BE CREATED AT THE END
-  game1.dealerCreation();
-
-  //Function to initiate cards distribution when pressing 'start'
-  const startDistribution = () => {
-    game1.dealCards();
-    start.removeEventListener("click", startDistribution);
-  };
-
-  start.addEventListener("click", startDistribution);
-}
-
-InitiateGame();
+start();

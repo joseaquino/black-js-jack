@@ -4,7 +4,7 @@
 export default class Player {
   domElement = null;
 
-  constructor(name, pot, playerType) {
+  constructor(name, pot = 5000, playerType = "GuestPlayer") {
     this.hand = [];
     this.name = name;
     this.pot = pot;
@@ -16,16 +16,19 @@ export default class Player {
     this.renderPlayerHtml(".players");
   }
 
+  playerHtml() {
+    return `
+      <div class="player" id="${this.name}">
+        <h2 class="player-heading">${this.name}</h2>
+        <div class="card"></div>
+      </div>
+    `;
+  }
+
   renderPlayerHtml(containerElement) {
     if (this.domElement) return;
-
     const htmlPlayersContainer = document.querySelector(containerElement);
-    const htmlPlayerString = `<div class="player" id="${this.name}">
-      <h2 class="player-heading">${this.name}</h2>
-      <div class="card"></div>
-    </div>`;
-
-    htmlPlayersContainer.insertAdjacentHTML("afterbegin", htmlPlayerString);
+    htmlPlayersContainer.insertAdjacentHTML("afterbegin", this.playerHtml());
     this.domElement = htmlPlayersContainer.querySelector(`#${this.name}`);
   }
 
@@ -36,21 +39,15 @@ export default class Player {
 
   renderNextCard() {
     if (this.nextCardToRender > this.hand.length - 1) return;
-
     let htmlString = "";
-
     const cardToRender = this.hand[this.nextCardToRender];
-
     if (cardToRender.faceDirection === "down") {
       htmlString = "Card down";
     } else {
       htmlString += `<p>${cardToRender.number} of ${cardToRender.suit} <i class="${cardToRender.icon}  "></i></p>`;
     }
-
     const cardContainerElem = this.domElement.querySelector(".card");
-
     cardContainerElem.insertAdjacentHTML("afterbegin", htmlString);
-
     this.nextCardToRender++;
   }
 }

@@ -5,11 +5,10 @@ export default class Card {
   constructor(suit, number) {
     this.suit = suit;
     this.number = number;
-    this.color = suit === "hearts" || suit === "spades" ? "red" : "black";
-    this.selectCardIcon();
+    this.assignSuitIcon();
   }
 
-  selectCardIcon() {
+  assignSuitIcon() {
     switch (this.suit) {
       case "clubs":
         this.icon = "fab fa-canadian-maple-leaf";

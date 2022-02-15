@@ -1,52 +1,31 @@
 "use strict";
 import { sleepNow } from "./Helpers.js";
-import Card from "./Card.js";
+
 import Player from "./Player.js";
+import Deck from "./Deck.js";
 
 export default class Board {
+  cardDeck = new Deck();
+
   constructor() {
-    this.deck = this.cardGeneration(); //Generates deck of cards
-    this.shuffledDeck = this.shuffle(this.deck); // Shuffle deck of cards
     this.players = [];
+    this.boardContainerElem = document.querySelector("#game");
+    this.boardContainerElem.innerHTML = this.boardHtml();
+    this.dealerCont = document.querySelector(".dealer");
+    this.playersCont = document.querySelector(".players");
   }
 
-  cardGeneration() {
-    const cardsArrGen = [];
-    const clubs = ["clubs", "diamonds", "hearts", "spades"];
-    const cards = ["As", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
-
-    const cardsClubs = clubs.length;
-    const differentCards = cards.length;
-
-    for (let i = 0; i < cardsClubs; i++) {
-      for (let j = 0; j < differentCards; j++) {
-        const card = new Card(clubs[i], cards[j]);
-        cardsArrGen.push(card);
-      }
-    }
-    return cardsArrGen;
+  boardHtml() {
+    return `
+      <h1 class="header">Black Jack</h1>
+      <div class="players-container">
+        <div class="dealer"></div>
+        <div class="players"></div>
+      </div>
+    `;
   }
 
-  shuffle(arr) {
-    const arrCopy = [...arr];
-
-    let totalOfElements = arrCopy.length;
-    let randomIndex;
-
-    while (totalOfElements !== 0) {
-      //generating a random number between 0 and last array element, [0, lastElement], inclusive
-      randomIndex = Math.round(Math.random() * (totalOfElements - 1));
-      totalOfElements--;
-
-      //changing last element with random index
-      let tempVariable = arrCopy[totalOfElements];
-      arrCopy[totalOfElements] = arrCopy[randomIndex];
-      arrCopy[randomIndex] = tempVariable;
-    }
-    return arrCopy;
-  }
-
-  dealerCreation() {
+  createDealer() {
     const dealer = new Player("Dealer", 2000000, "Dealer");
     dealer.renderPlayerHtml(".dealer");
     //Storing player1 inside players array
@@ -60,11 +39,12 @@ export default class Board {
   async dealCards() {
     const amountOfPlayers = this.players.length;
     const cardsToGive = 2 * amountOfPlayers;
+    const generatorCardObject = this.cardDeck.handsGenerator();
 
     for (let i = 0; i < cardsToGive; i++) {
       let playerToGetCard = (i + amountOfPlayers) % amountOfPlayers;
 
-      let [card] = this.shuffledDeck.slice(i, i + 1);
+      let card = generatorCardObject.next().value;
 
       const currentPlayerBeingDealt = this.players[playerToGetCard];
 
@@ -76,5 +56,10 @@ export default class Board {
 
       await sleepNow(1000);
     }
+  }
+
+  clearBoard() {
+    this.dealerCont.innerHTML = "";
+    this.playersCont.innerHTML = "";
   }
 }
