@@ -1,6 +1,7 @@
 "use strict";
 import { sleepNow } from "./Helpers.js";
 
+import playerDecisionController from "./playerDecisionController.js";
 import Player from "./Player.js";
 import Deck from "./Deck.js";
 
@@ -13,6 +14,7 @@ export default class Board {
     this.boardContainerElem.innerHTML = this.boardHtml();
     this.dealerCont = document.querySelector(".dealer");
     this.playersCont = document.querySelector(".players");
+    this.generatorCardObject = this.cardDeck.handsGenerator();
   }
 
   boardHtml() {
@@ -36,15 +38,16 @@ export default class Board {
     this.players.push(player);
   }
 
-  async dealCards() {
+  async initialCardDealing() {
     const amountOfPlayers = this.players.length;
     const cardsToGive = 2 * amountOfPlayers;
-    const generatorCardObject = this.cardDeck.handsGenerator();
+    // const deck = this.deck;
+    // const generatorCardObject = this.cardDeck.handsGenerator(deck);
 
     for (let i = 0; i < cardsToGive; i++) {
       let playerToGetCard = (i + amountOfPlayers) % amountOfPlayers;
 
-      let card = generatorCardObject.next().value;
+      let card = this.generatorCardObject.next().value;
 
       const currentPlayerBeingDealt = this.players[playerToGetCard];
 
@@ -54,12 +57,19 @@ export default class Board {
 
       currentPlayerBeingDealt.receiveCard(card);
 
-      await sleepNow(1000);
+      await sleepNow(500);
     }
   }
 
   clearBoard() {
     this.dealerCont.innerHTML = "";
     this.playersCont.innerHTML = "";
+  }
+
+  letPlayersPlay() {
+    const playerControls = new playerDecisionController(
+      this.players,
+      this.generatorCardObject
+    );
   }
 }

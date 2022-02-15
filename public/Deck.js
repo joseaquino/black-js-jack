@@ -26,5 +26,6 @@ export default class Deck {
       yield this.deck[randomIndex];
       this.deck.splice(randomIndex, 1);
     }
+    throw new Error("There are no more cards");
   }
 }

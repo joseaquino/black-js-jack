@@ -18,10 +18,12 @@ export default class Player {
 
   playerHtml() {
     return `
-      <div class="player" id="${this.name}">
-        <h2 class="player-heading">${this.name}</h2>
-        <div class="card"></div>
-      </div>
+    <div class="player" id="${this.name}">
+      <h2 class="player-heading">${this.name}</h2>
+      <div class="card"></div>
+      <div class='player__hand-value'></div>
+    </div>
+    
     `;
   }
 
@@ -32,9 +34,68 @@ export default class Player {
     this.domElement = htmlPlayersContainer.querySelector(`#${this.name}`);
   }
 
+  sumOfCards() {
+    let sumOfHand = 0;
+
+    const arrOfCardsWithFixedValues = this.hand.filter(
+      (card) => !card.alternateValue
+    );
+
+    const arrOfCardsWithAlternateValues = this.hand.filter(
+      (card) => card.alternateValue
+    );
+
+    let amountOfAces = arrOfCardsWithAlternateValues.length;
+    let alternateValuesUsed = 0;
+    const amountReducedIfAceChangesTo1 = 10;
+
+    for (let card of arrOfCardsWithFixedValues) {
+      if (card.faceDirection === "down") break;
+      sumOfHand += card.value;
+    }
+
+    if (amountOfAces === 0) {
+      this.handValue = sumOfHand;
+      return;
+    }
+
+    for (let card of arrOfCardsWithAlternateValues) {
+      if (card.faceDirection === "down") break;
+      if (sumOfHand + card.value > 21) {
+        sumOfHand = sumOfHand + card.alternateValue;
+        alternateValuesUsed++;
+      } else {
+        sumOfHand = sumOfHand + card.value;
+      }
+
+      if (sumOfHand > 21 && alternateValuesUsed < amountOfAces) {
+        sumOfHand -= amountReducedIfAceChangesTo1;
+        alternateValuesUsed++;
+      }
+    }
+    this.handValue = sumOfHand;
+
+    return;
+  }
+
+  playerHandValueHtml() {
+    return `    
+    ${this.handValue}    
+    `;
+  }
+
+  renderHandValue() {
+    const sumContainer = document
+      .querySelector(`#${this.name}`)
+      .querySelector(".player__hand-value");
+    sumContainer.innerHTML = this.playerHandValueHtml();
+  }
+
   receiveCard(card) {
     this.hand.push(card);
     this.renderNextCard();
+    this.sumOfCards();
+    this.renderHandValue();
   }
 
   renderNextCard() {
@@ -42,12 +103,19 @@ export default class Player {
     let htmlString = "";
     const cardToRender = this.hand[this.nextCardToRender];
     if (cardToRender.faceDirection === "down") {
-      htmlString = "Card down";
+      htmlString = '<p id="hidden">Card down</p>';
     } else {
       htmlString += `<p>${cardToRender.number} of ${cardToRender.suit} <i class="${cardToRender.icon}  "></i></p>`;
     }
     const cardContainerElem = this.domElement.querySelector(".card");
     cardContainerElem.insertAdjacentHTML("afterbegin", htmlString);
     this.nextCardToRender++;
+  }
+
+  secondDealerCard() {
+    const secondCard = this.hand.pop();
+    secondCard.flipCard();
+    document.querySelector("#hidden").remove();
+    return secondCard;
   }
 }
