@@ -76,4 +76,11 @@ export default class Board {
     this.dealerCont.innerHTML = "";
     this.playersCont.innerHTML = "";
   }
+
+  letPlayersPlay() {
+    const playerControls = new playerDecisionController(
+      this.players,
+      this.generatorCardObject
+    );
+  }
 }
