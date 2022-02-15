@@ -16,7 +16,7 @@ const start = () => {
   const restartBtn = document.createElement("button");
   restartBtn.innerHTML = "Choose new players";
 
-  const welcomeScreen = new WelcomeScreen((players) => {
+  const welcomeScreen = new WelcomeScreen( async (players) => {
     const game = new Board();
     container.prepend(restartBtn);
     players.forEach((player) => game.addPlayer(new Player(player.name)));
@@ -24,14 +24,11 @@ const start = () => {
     game.players.forEach((player) => {
       player.renderPlayer();
     });
-    game.dealerCreation();
+    game.createDealer();
 
-    const startDistribution = async () => {
-      await sleepNow(1500);
-      game.dealCards();
-    };
-
-    startDistribution();
+    // We will wait some time before dealing the cards to smooth out the transition between the welcome screen and the board
+    await sleepNow(1500);
+    await game.dealCards();
 
     restartBtn.addEventListener("click", () => {
       game.clearBoard();

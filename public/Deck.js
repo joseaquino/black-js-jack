@@ -3,9 +3,7 @@
 import Card from "./Card.js";
 
 export default class Deck {
-  constructor() {}
-
-  cardGeneration() {
+  constructor() {
     const cardsArrGen = [];
     const clubs = ["clubs", "diamonds", "hearts", "spades"];
     const cards = ["As", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
@@ -19,16 +17,14 @@ export default class Deck {
         cardsArrGen.push(card);
       }
     }
-    return cardsArrGen;
+    this.deck = cardsArrGen;
   }
 
-  *handsGenerator(deck) {
-    const deckCopy = [...deck];
-
-    while (deckCopy.length > 0) {
-      let randomIndex = Math.round(Math.random() * (deckCopy.length - 1));
-      yield deckCopy[randomIndex];
-      deckCopy.splice(randomIndex, 1);
+  *handsGenerator() {
+    while (this.deck.length > 0) {
+      let randomIndex = Math.round(Math.random() * (this.deck.length - 1));
+      yield this.deck[randomIndex];
+      this.deck.splice(randomIndex, 1);
     }
   }
 }

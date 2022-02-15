@@ -17,10 +17,11 @@ export default class Player {
   }
 
   playerHtml() {
-    return `<div class="player" id="${this.name}">
-    <h2 class="player-heading">${this.name}</h2>
-    <div class="card"></div>
-    </div>
+    return `
+      <div class="player" id="${this.name}">
+        <h2 class="player-heading">${this.name}</h2>
+        <div class="card"></div>
+      </div>
     `;
   }
 
