@@ -67,9 +67,6 @@ export default class Board {
   }
 
   letPlayersPlay() {
-    const playerControls = new playerDecisionController(
-      this.players,
-      this.generatorCardObject
-    );
+    new playerDecisionController(this.players, this.generatorCardObject);
   }
 }
