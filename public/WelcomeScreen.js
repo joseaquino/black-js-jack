@@ -12,6 +12,13 @@ export default class WelcomeScreen {
       );
     }
     this.onStart = onStart;
+    // Creating out Modal container element
+    const modalContainerElem = document.createElement("div");
+    modalContainerElem.classList.add("modal");
+    this.modalContainerElem = modalContainerElem;
+    //
+    //
+    // Creating the Modal overlay or backdrop element
     const modalOverlay = document.createElement("div");
     modalOverlay.classList.add("modal__overlay");
     this.modalOverlayElem = modalOverlay;
