@@ -80,4 +80,12 @@ export default class Board {
   letPlayersPlay() {
     new playerDecisionController(this.players, this.generatorCardObject);
   }
+
+  letPlayersBet(fn) {
+    this.betController.initPlayers();
+    this.betController.rederBetControls();
+    this.betController.selectDomElements();
+    this.betController.addEventListeners();
+    this.betController.allowInitialBet(fn);
+  }
 }

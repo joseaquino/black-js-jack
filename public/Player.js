@@ -36,6 +36,16 @@ export default class Player {
     this.domElement = htmlPlayersContainer.querySelector(`#${this.name}`);
   }
 
+  initialBet() {}
+
+  playerBetValurHtml() {
+    return `
+    Apuesta:${this.betValue}
+    `;
+  }
+
+  renderBetValue() {}
+
   sumOfCards() {
     let sumOfHand = 0;
 
