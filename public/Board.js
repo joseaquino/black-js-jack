@@ -4,6 +4,7 @@ import { sleepNow } from "./Helpers.js";
 import playerDecisionController from "./playerDecisionController.js";
 import Player from "./Player.js";
 import Deck from "./Deck.js";
+import playersBetController from "./playersBetController.js";
 
 export default class Board {
   cardDeck = new Deck();
@@ -15,6 +16,7 @@ export default class Board {
     this.dealerCont = document.querySelector(".dealer");
     this.playersCont = document.querySelector(".players");
     this.generatorCardObject = this.cardDeck.handsGenerator();
+    this.betController = new playersBetController(this.players);
   }
 
   boardHtml() {
@@ -68,5 +70,13 @@ export default class Board {
 
   letPlayersPlay() {
     new playerDecisionController(this.players, this.generatorCardObject);
+  }
+
+  letPlayersBet(fn) {
+    this.betController.initPlayers();
+    this.betController.rederBetControls();
+    this.betController.selectDomElements();
+    this.betController.addEventListeners();
+    this.betController.allowInitialBet(fn);
   }
 }

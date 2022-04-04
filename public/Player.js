@@ -10,6 +10,7 @@ export default class Player {
     this.pot = pot;
     this.playerType = playerType;
     this.nextCardToRender = 0;
+    this.bet = 0;
   }
 
   renderPlayer() {
@@ -22,6 +23,7 @@ export default class Player {
       <h2 class="player-heading">${this.name}</h2>
       <div class="card"></div>
       <div class='player__hand-value'></div>
+      <div class='player__bet-value'></div>
     </div>
     
     `;
@@ -33,6 +35,16 @@ export default class Player {
     htmlPlayersContainer.insertAdjacentHTML("afterbegin", this.playerHtml());
     this.domElement = htmlPlayersContainer.querySelector(`#${this.name}`);
   }
+
+  initialBet() {}
+
+  playerBetValurHtml() {
+    return `
+    Apuesta:${this.betValue}
+    `;
+  }
+
+  renderBetValue() {}
 
   sumOfCards() {
     let sumOfHand = 0;
