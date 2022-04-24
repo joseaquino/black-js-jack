@@ -83,6 +83,11 @@ export default class PlayersBetController {
     return lastPlayerPosition === this.currentPlayerTurn;
   }
 
+  isLastPlayerTurn() {
+    const lastPlayerPosition = this.players.length - 2;
+    return lastPlayerPosition === this.currentPlayerTurn;
+  }
+
   nextPlayer() {
     this.activePlayer.removeFocus();
     if (this.isLastPlayerTurn()) {
