@@ -26,13 +26,7 @@ const start = () => {
     });
     game.createDealer();
 
-    game.letPlayersBet(startGame);
-
-    async function startGame() {
-      await sleepNow(500);
-      await game.initialCardDealing();
-      game.letPlayersPlay();
-    }
+    game.startWithGameBets();
 
     restartBtn.addEventListener("click", () => {
       game.clearBoard();

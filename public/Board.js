@@ -16,7 +16,7 @@ export default class Board {
     this.dealerCont = document.querySelector(".dealer");
     this.playersCont = document.querySelector(".players");
     this.generatorCardObject = this.cardDeck.handsGenerator();
-    this.betController = new playersBetController(this.players);
+    this.betController = new playersBetController(this);
   }
 
   boardHtml() {
@@ -37,7 +37,8 @@ export default class Board {
   }
 
   addPlayer(player) {
-    this.players.push(player);
+    // this.players.push(player);
+    this.players = [...this.players, player];
   }
 
   async initialCardDealing() {
@@ -63,20 +64,22 @@ export default class Board {
     }
   }
 
-  clearBoard() {
-    this.dealerCont.innerHTML = "";
-    this.playersCont.innerHTML = "";
+  async sartWithGameDealing() {
+    await sleepNow(500);
+    await this.initialCardDealing();
+    this.letPlayersPlay();
+  }
+
+  startWithGameBets() {
+    this.betController.initBetController();
   }
 
   letPlayersPlay() {
-    new playerDecisionController(this.players, this.generatorCardObject);
+    new playerDecisionController(this);
   }
 
-  letPlayersBet(fn) {
-    this.betController.initPlayers();
-    this.betController.rederBetControls();
-    this.betController.selectDomElements();
-    this.betController.addEventListeners();
-    this.betController.allowInitialBet(fn);
+  clearBoard() {
+    this.dealerCont.innerHTML = "";
+    this.playersCont.innerHTML = "";
   }
 }

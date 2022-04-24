@@ -1,20 +1,17 @@
 "use strict";
 export default class playersBetController {
-  constructor(players) {
+  constructor(board) {
     this.currentPlayerTurn = 0;
-    this.players = players;
-    this.activePlayer = this.players[this.currentPlayerTurn];
+    this.board = board;
     this.currentBet = 0;
-    this.playersStillBetting = false;
 
-    const controlsContainerEle = document.querySelector("#game");
-    this.controlsContainerEle = controlsContainerEle;
+    this.controlsContainerEle = document.querySelector("#game");
   }
 
-  //Cada jugador debe hacer su apuesta antes de la reparticion de cartas
+  //Each player must place their bet before the cards are dealt
 
-  //Despues de repartir las cartas sila carta del dealer es As, los jugadores pueden hacer una apuesta de seguro, el maximo que se puee apostar es la miad de la apuesta inicial , se deja en la llinea de apuesta segura y se paga 2 a 1
-  // si se hace apuesta de seguro luego el jugador inicia su mano con normalidad, es decir con las mismas opciones de siempre
+  //After dealing the cards if the dealer's card is Ace, the players can make an insurance bet, the maximum that can be bet is half the initial bet, it is left on the insurance bet line and it pays 2 to one
+  // if an insurance bet is made, then the player starts his hand normally, that is, with the same options as always
 
   controlsHtml() {
     return `
@@ -47,8 +44,15 @@ export default class playersBetController {
     );
   }
 
+  initBetController() {
+    this.initPlayers();
+    this.rederBetControls();
+    this.selectDomElements();
+    this.addEventListeners();
+  }
+
   initPlayers() {
-    this.amountOfPlayers = this.players.length;
+    this.players = this.board.players;
     this.updateActivePlayer();
   }
 
@@ -80,14 +84,18 @@ export default class playersBetController {
       .classList.add("active");
   }
 
+  isLastPlayerTurn() {
+    const lastPlayerPosition = this.players.length - 2;
+    return lastPlayerPosition === this.currentPlayerTurn;
+  }
+
   nextPlayer() {
     document
       .querySelector(`#${this.activePlayer.name} .card`)
       .classList.remove("active");
-    if (this.amountOfPlayers - 2 === this.currentPlayerTurn) {
+    if (this.isLastPlayerTurn()) {
       this.betControls.remove();
-      this.playersStillBetting = true;
-      return;
+      this.board.sartWithGameDealing();
     } else {
       this.currentPlayerTurn++;
       this.updateActivePlayer();
@@ -128,20 +136,5 @@ export default class playersBetController {
     );
     this.currentBet = 0;
     this.nextPlayer();
-  }
-
-  async allowInitialBet(fn) {
-    if (!this.playersStillBetting) {
-      // await sleepNow(1500);
-      this.loopInit(() => this.allowInitialBet(fn));
-    } else {
-      fn();
-      return;
-    }
-  }
-
-  loopInit(fn) {
-    console.log("inLoopInit");
-    window.requestAnimationFrame(fn.bind(this));
   }
 }

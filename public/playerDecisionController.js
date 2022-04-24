@@ -1,7 +1,7 @@
 "use strict";
 
 export default class playerDecisionController {
-  constructor(players, generatorCardObject) {
+  constructor({ players, generatorCardObject }) {
     if (!Array.isArray(players)) {
       throw new Error(
         `You must provider an array with the players to the playerDecisionController constructor`
@@ -13,8 +13,7 @@ export default class playerDecisionController {
     this.generatorCardObject = generatorCardObject;
     this.currentPlayerTurn = this.definePlayerTurn();
 
-    const controlsContainerEle = document.querySelector("#game");
-    this.controlsContainerEle = controlsContainerEle;
+    this.controlsContainerEle = document.querySelector("#game");
     this.controlsContainerEle.insertAdjacentHTML(
       "beforeend",
       this.controlsHtml()
