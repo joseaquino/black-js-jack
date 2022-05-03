@@ -129,7 +129,9 @@ export default class playersBetController {
   confirmBet() {
     this.clear.disabled = true;
     this.confirm.disabled = true;
-    let playerHtmlCont = document.querySelector(`#${this.activePlayer.name}`);
+    let playerHtmlCont = document.querySelector(
+      `#${this.activePlayer.name} .player__bet-value`
+    );
     playerHtmlCont.insertAdjacentHTML(
       "afterbegin",
       `Betting: ${this.currentBet}`
