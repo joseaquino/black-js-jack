@@ -1,8 +1,10 @@
 "use strict";
 import { sleepNow } from "./Helpers.js";
 
+import playerDecisionController from "./playerDecisionController.js";
 import Player from "./Player.js";
 import Deck from "./Deck.js";
+import playersBetController from "./playersBetController.js";
 
 export default class Board {
   cardDeck = new Deck();
@@ -13,6 +15,9 @@ export default class Board {
     this.boardContainerElem.innerHTML = this.boardHtml();
     this.dealerCont = document.querySelector(".dealer");
     this.playersCont = document.querySelector(".players");
+    this.generatorCardObject = this.cardDeck.handsGenerator();
+    this.betController = new playersBetController(this);
+    this.safeBetHasFinished = false;
   }
 
   boardHtml() {
@@ -33,18 +38,20 @@ export default class Board {
   }
 
   addPlayer(player) {
-    this.players.push(player);
+    // this.players.push(player);
+    this.players = [...this.players, player];
   }
 
-  async dealCards() {
+  async initialCardDealing() {
     const amountOfPlayers = this.players.length;
     const cardsToGive = 2 * amountOfPlayers;
-    const generatorCardObject = this.cardDeck.handsGenerator();
+    // const deck = this.deck;
+    // const generatorCardObject = this.cardDeck.handsGenerator(deck);
 
     for (let i = 0; i < cardsToGive; i++) {
       let playerToGetCard = (i + amountOfPlayers) % amountOfPlayers;
 
-      let card = generatorCardObject.next().value;
+      let card = this.generatorCardObject.next().value;
 
       const currentPlayerBeingDealt = this.players[playerToGetCard];
 
@@ -54,12 +61,43 @@ export default class Board {
 
       currentPlayerBeingDealt.receiveCard(card);
 
-      await sleepNow(1000);
+      await sleepNow(500);
     }
+  }
+
+  async sartWithGameDealing() {
+    await sleepNow(500);
+
+    if (!this.safeBetHasFinished) {
+      await this.initialCardDealing();
+    }
+
+    //CHECK IF DEALER HAS AN ACE
+    //IF DEALER HAS AN ACE ALLOW PLAYERS TO MAKE THE SAFE BET
+    if (this.hasDealerHaveAnAce() && !this.safeBetHasFinished) {
+      this.betController.initBetController();
+      return;
+    }
+    //AFTER SAFE BET LET PLAYERS PLAY
+    this.letPlayersPlay();
+  }
+
+  startWithGameBets() {
+    this.betController.initBetController();
+  }
+
+  letPlayersPlay() {
+    new playerDecisionController(this);
   }
 
   clearBoard() {
     this.dealerCont.innerHTML = "";
     this.playersCont.innerHTML = "";
+  }
+
+  hasDealerHaveAnAce() {
+    const aceValue = 11;
+    const dealerInitialCardValue = this.players.slice(-1)[0].handValue;
+    return dealerInitialCardValue === aceValue;
   }
 }

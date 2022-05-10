@@ -6,7 +6,8 @@ export default class Deck {
   constructor() {
     const cardsArrGen = [];
     const clubs = ["clubs", "diamonds", "hearts", "spades"];
-    const cards = ["As", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
+    const cards = ["Ace", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
+    // const cards = ["As", "As", "As", "As", "As", "As", "As", "As", "As", "As"]; //JUST FOR TESTING, REMOVE LATER
 
     const cardsClubs = clubs.length;
     const differentCards = cards.length;
@@ -26,5 +27,6 @@ export default class Deck {
       yield this.deck[randomIndex];
       this.deck.splice(randomIndex, 1);
     }
+    throw new Error("There are no more cards");
   }
 }
