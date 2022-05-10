@@ -95,7 +95,7 @@ export default class playersBetController {
       .classList.remove("active");
     if (this.isLastPlayerTurn()) {
       this.betControls.remove();
-      this.board.sartWithGameDealing();
+      this.board.startWithGameDealing();
     } else {
       this.currentPlayerTurn++;
       this.updateActivePlayer();

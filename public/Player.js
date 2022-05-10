@@ -36,71 +36,49 @@ export default class Player {
     this.domElement = htmlPlayersContainer.querySelector(`#${this.name}`);
   }
 
-  initialBet() {}
-
-  playerBetValurHtml() {
-    return `
-    Apuesta:${this.betValue}
-    `;
-  }
-
-  renderBetValue() {}
-
   sumOfCards() {
     let sumOfHand = 0;
 
-    const arrOfCardsWithFixedValues = this.hand.filter(
-      (card) => !card.alternateValue
-    );
-
-    const arrOfCardsWithAlternateValues = this.hand.filter(
-      (card) => card.alternateValue
-    );
+    const [arrOfCardsWithFixedValues, arrOfCardsWithAlternateValues] =
+      this.hand.reduce(
+        ([arrOfCardsWithFixedValues, arrOfCardsWithAlternateValues], card) => {
+          if (card.alternateValue) {
+            arrOfCardsWithAlternateValues.push(card);
+          } else {
+            arrOfCardsWithFixedValues.push(card);
+          }
+          return [arrOfCardsWithFixedValues, arrOfCardsWithAlternateValues];
+        },
+        [[], []]
+      );
 
     let amountOfAces = arrOfCardsWithAlternateValues.length;
-    let alternateValuesUsed = 0;
-    const amountReducedIfAceChangesTo1 = 10;
 
     for (let card of arrOfCardsWithFixedValues) {
       if (card.faceDirection === "down") break;
       sumOfHand += card.value;
     }
 
-    if (amountOfAces === 0) {
-      this.handValue = sumOfHand;
-      return;
-    }
-
-    for (let card of arrOfCardsWithAlternateValues) {
-      if (card.faceDirection === "down") break;
-      if (sumOfHand + card.value > 21) {
-        sumOfHand = sumOfHand + card.alternateValue;
-        alternateValuesUsed++;
-      } else {
-        sumOfHand = sumOfHand + card.value;
-      }
-
-      if (sumOfHand > 21 && alternateValuesUsed < amountOfAces) {
-        sumOfHand -= amountReducedIfAceChangesTo1;
-        alternateValuesUsed++;
+    if (amountOfAces !== 0) {
+      for (let card of arrOfCardsWithAlternateValues) {
+        if (card.faceDirection === "down") break;
+        if (sumOfHand + card.value > 21) {
+          sumOfHand += card.alternateValue;
+        } else {
+          sumOfHand += card.value;
+        }
       }
     }
+
     this.handValue = sumOfHand;
-
     return;
-  }
-
-  playerHandValueHtml() {
-    return `    
-    ${this.handValue}    
-    `;
   }
 
   renderHandValue() {
     const sumContainer = document
       .querySelector(`#${this.name}`)
       .querySelector(".player__hand-value");
-    sumContainer.innerHTML = this.playerHandValueHtml();
+    sumContainer.innerHTML = this.handValue.toString();
   }
 
   receiveCard(card) {
@@ -115,7 +93,7 @@ export default class Player {
     let htmlString = "";
     const cardToRender = this.hand[this.nextCardToRender];
     if (cardToRender.faceDirection === "down") {
-      htmlString = '<p id="hidden">Card down</p>';
+      htmlString = '<p id="hidden-card">Card down</p>';
     } else {
       htmlString += `<p>${cardToRender.number} of ${cardToRender.suit} <i class="${cardToRender.icon}  "></i></p>`;
     }
@@ -127,7 +105,7 @@ export default class Player {
   secondDealerCard() {
     const secondCard = this.hand.pop();
     secondCard.flipCard();
-    document.querySelector("#hidden").remove();
+    document.querySelector("#hidden-card").remove();
     return secondCard;
   }
 }

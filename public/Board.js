@@ -37,15 +37,12 @@ export default class Board {
   }
 
   addPlayer(player) {
-    // this.players.push(player);
     this.players = [...this.players, player];
   }
 
   async initialCardDealing() {
     const amountOfPlayers = this.players.length;
     const cardsToGive = 2 * amountOfPlayers;
-    // const deck = this.deck;
-    // const generatorCardObject = this.cardDeck.handsGenerator(deck);
 
     for (let i = 0; i < cardsToGive; i++) {
       let playerToGetCard = (i + amountOfPlayers) % amountOfPlayers;
@@ -64,7 +61,7 @@ export default class Board {
     }
   }
 
-  async sartWithGameDealing() {
+  async startWithGameDealing() {
     await sleepNow(500);
     await this.initialCardDealing();
     this.letPlayersPlay();
@@ -81,5 +78,9 @@ export default class Board {
   clearBoard() {
     this.dealerCont.innerHTML = "";
     this.playersCont.innerHTML = "";
+  }
+
+  dealCard() {
+    return this.generatorCardObject.next().value;
   }
 }

@@ -1,19 +1,17 @@
 "use strict";
 
 export default class playerDecisionController {
-  constructor({ players, generatorCardObject }) {
-    if (!Array.isArray(players)) {
+  constructor(board) {
+    if (!Array.isArray(board.players)) {
       throw new Error(
         `You must provider an array with the players to the playerDecisionController constructor`
       );
     }
-
-    this.players = players;
+    this.board = board;
+    this.players = this.board.players;
     this.amountOfPlayers = this.players.length;
-    this.generatorCardObject = generatorCardObject;
-    this.currentPlayerTurn = this.definePlayerTurn();
 
-    this.controlsContainerEle = document.querySelector("#game");
+    this.controlsContainerEle = this.board.boardContainerElem;
     this.controlsContainerEle.insertAdjacentHTML(
       "beforeend",
       this.controlsHtml()
@@ -26,6 +24,8 @@ export default class playerDecisionController {
 
     this.hit.addEventListener("click", this.hitting.bind(this));
     this.stand.addEventListener("click", this.standing.bind(this));
+
+    this.definePlayerTurn();
   }
 
   controlsHtml() {
@@ -47,15 +47,17 @@ export default class playerDecisionController {
   }
 
   definePlayerTurn() {
-    let currentPlayerTurn = 0;
+    this.currentPlayerTurn = 0;
     for (let player of this.players) {
-      if (player.handValue === 21) currentPlayerTurn++;
+      if (player.handValue === 21) this.currentPlayerTurn++;
       else {
         document
-          .querySelector(`#${this.players[currentPlayerTurn].name}`)
-          .querySelector(".card")
+          .querySelector(`#${this.players[this.currentPlayerTurn].name} .card`)
           .classList.add("active");
-        return currentPlayerTurn;
+        if (this.isDealerTurn()) {
+          this.dealerPlay();
+        }
+        return;
       }
     }
   }
@@ -64,7 +66,7 @@ export default class playerDecisionController {
     return this.players[this.currentPlayerTurn].handValue === 21;
   }
 
-  hasPlayerMoreThan21() {
+  hasPlayer21OrMore() {
     return this.players[this.currentPlayerTurn].handValue >= 21;
   }
 
@@ -94,7 +96,8 @@ export default class playerDecisionController {
       .classList.remove("active");
 
     this.currentPlayerTurn++;
-    if (this.hasPlayer21() && !this.isDealerTurn()) this.currentPlayerTurn++;
+    if (this.hasPlayer21OrMore() && !this.isDealerTurn())
+      this.currentPlayerTurn++;
     document
       .querySelector(`#${this.players[this.currentPlayerTurn].name}`)
       .querySelector(".card")
@@ -108,18 +111,10 @@ export default class playerDecisionController {
     return;
   }
 
-  dealCard() {
-    return this.generatorCardObject.next().value;
-  }
-
   hitting() {
-    const card = this.dealCard();
+    const card = this.board.dealCard();
     this.players[this.currentPlayerTurn].receiveCard(card);
-    if (
-      (this.hasPlayerMoreThan21() || this.hasPlayer21()) &&
-      !this.isDealerTurn()
-    )
-      this.nextPlayer();
+    if (this.hasPlayer21OrMore() && !this.isDealerTurn()) this.nextPlayer();
     return;
   }
 
