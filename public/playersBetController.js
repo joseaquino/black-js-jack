@@ -4,7 +4,6 @@ export default class playersBetController {
     this.currentPlayerTurn = 0;
     this.board = board;
     this.currentBet = 0;
-
     this.controlsContainerEle = document.querySelector("#game");
   }
 
@@ -18,6 +17,9 @@ export default class playersBetController {
     <div class='bet-controls'>
         <div class='bet-controls__pot'>Pot: ${this.activePlayer.pot}</div>
         <div class='bet-controls__bet'>Current bet: ${this.currentBet}</div>    
+        <button type='button' class= 'bet-controls__btn btn--skip' disabled>
+        Skip
+        </button>
         <button type='button' class= 'bet-controls__btn btn--25'>
         25
         </button>
@@ -49,6 +51,9 @@ export default class playersBetController {
     this.rederBetControls();
     this.selectDomElements();
     this.addEventListeners();
+    if (this.isSafeBetRound()) {
+      this.skip.removeAttribute("disabled");
+    }
   }
 
   initPlayers() {
@@ -58,6 +63,7 @@ export default class playersBetController {
 
   selectDomElements() {
     this.betControls = document.querySelector(".bet-controls");
+    this.skip = document.querySelector(".btn--skip");
     this.bet25 = this.controlsContainerEle.querySelector(".btn--25");
     this.bet50 = this.controlsContainerEle.querySelector(".btn--50");
     this.bet100 = this.controlsContainerEle.querySelector(".btn--100");
@@ -70,6 +76,7 @@ export default class playersBetController {
   }
 
   addEventListeners() {
+    this.skip.addEventListener("click", this.skipping);
     this.bet25.addEventListener("click", this.betting.bind(this));
     this.bet50.addEventListener("click", this.betting.bind(this));
     this.bet100.addEventListener("click", this.betting.bind(this));
@@ -95,6 +102,11 @@ export default class playersBetController {
       .classList.remove("active");
     if (this.isLastPlayerTurn()) {
       this.betControls.remove();
+      if (this.isSafeBetRound()) {
+        this.board.safeBetHasFinished = true;
+      }
+      this.currentPlayerTurn = 0;
+
       this.board.sartWithGameDealing();
     } else {
       this.currentPlayerTurn++;
@@ -132,11 +144,30 @@ export default class playersBetController {
     let playerHtmlCont = document.querySelector(
       `#${this.activePlayer.name} .player__bet-value`
     );
-    playerHtmlCont.insertAdjacentHTML(
-      "afterbegin",
-      `Betting: ${this.currentBet}`
-    );
+
+    if (this.isSafeBetRound()) {
+      playerHtmlCont.insertAdjacentHTML(
+        "afterend",
+        `Safe Bet: ${this.currentBet}`
+      );
+    } else {
+      playerHtmlCont.insertAdjacentHTML(
+        "afterbegin",
+        `Betting: ${this.currentBet}`
+      );
+    }
+
     this.currentBet = 0;
     this.nextPlayer();
   }
+
+  isSafeBetRound() {
+    return this.board.hasDealerHaveAnAce();
+  }
+
+  skipping = () => {
+    this.clear.disabled = true;
+    this.confirm.disabled = true;
+    this.nextPlayer();
+  };
 }

@@ -17,6 +17,7 @@ export default class Board {
     this.playersCont = document.querySelector(".players");
     this.generatorCardObject = this.cardDeck.handsGenerator();
     this.betController = new playersBetController(this);
+    this.safeBetHasFinished = false;
   }
 
   boardHtml() {
@@ -66,7 +67,18 @@ export default class Board {
 
   async sartWithGameDealing() {
     await sleepNow(500);
-    await this.initialCardDealing();
+
+    if (!this.safeBetHasFinished) {
+      await this.initialCardDealing();
+    }
+
+    //CHECK IF DEALER HAS AN ACE
+    //IF DEALER HAS AN ACE ALLOW PLAYERS TO MAKE THE SAFE BET
+    if (this.hasDealerHaveAnAce() && !this.safeBetHasFinished) {
+      this.betController.initBetController();
+      return;
+    }
+    //AFTER SAFE BET LET PLAYERS PLAY
     this.letPlayersPlay();
   }
 
@@ -81,5 +93,11 @@ export default class Board {
   clearBoard() {
     this.dealerCont.innerHTML = "";
     this.playersCont.innerHTML = "";
+  }
+
+  hasDealerHaveAnAce() {
+    const aceValue = 11;
+    const dealerInitialCardValue = this.players.slice(-1)[0].handValue;
+    return dealerInitialCardValue === aceValue;
   }
 }
