@@ -4,7 +4,7 @@
 export default class Player {
   domElement = null;
 
-  constructor(name, pot = 5000, playerType = "GuestPlayer") {
+  constructor(name, pot = 200, playerType = "GuestPlayer") {
     this.hand = [];
     this.name = name;
     this.pot = pot;
@@ -107,5 +107,25 @@ export default class Player {
     secondCard.flipCard();
     document.querySelector("#hidden-card").remove();
     return secondCard;
+  }
+
+  addFocurs() {
+    document
+      .querySelector(`#${this.name}`)
+      .querySelector(".card")
+      .classList.add("active");
+  }
+
+  removeFocus() {
+    document.querySelector(`#${this.name} .card`).classList.remove("active");
+  }
+
+  removeFromPot(bet) {
+    this.pot -= bet;
+  }
+
+  renderBetValue(bet) {
+    let playerHtmlCont = document.querySelector(`#${this.name}`);
+    playerHtmlCont.insertAdjacentHTML("afterbegin", `Betting: ${bet}`);
   }
 }

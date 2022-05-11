@@ -1,11 +1,11 @@
 "use strict";
-export default class playersBetController {
+export default class PlayersBetController {
   constructor(board) {
     this.currentPlayerTurn = 0;
     this.board = board;
     this.currentBet = 0;
 
-    this.controlsContainerEle = document.querySelector("#game");
+    this.controlsContainerEle = this.board.boardContainerElem;
   }
 
   //Each player must place their bet before the cards are dealt
@@ -37,7 +37,7 @@ export default class playersBetController {
       `;
   }
 
-  rederBetControls() {
+  renderBetControls() {
     this.controlsContainerEle.insertAdjacentHTML(
       "beforeend",
       this.controlsHtml()
@@ -46,7 +46,7 @@ export default class playersBetController {
 
   initBetController() {
     this.initPlayers();
-    this.rederBetControls();
+    this.renderBetControls();
     this.selectDomElements();
     this.addEventListeners();
   }
@@ -108,16 +108,30 @@ export default class playersBetController {
     this.clear.disabled = false;
     this.confirm.disabled = false;
     const betAddition = e.target.innerText;
+
     if (this.activePlayer.pot - betAddition < 0) {
       return;
     }
-    this.activePlayer.pot -= betAddition;
-    this.currentBet += 1 * betAddition;
+
+    this.activePlayer.removeFromPot(betAddition);
+    this.currentBet += Number(betAddition);
     this.currentPotCont.innerHTML = `Pot: ${this.activePlayer.pot}`;
     this.curretBetCont.innerHTML = `Current bet: ${this.currentBet}`;
+
+    switch (true) {
+      case this.activePlayer.pot < 25:
+        this.bet25.setAttribute("disabled", "true");
+      case this.activePlayer.pot < 50:
+        this.bet50.setAttribute("disabled", "true");
+      case this.activePlayer.pot < 100:
+        this.bet100.setAttribute("disabled", "true");
+    }
   }
 
   clearBet() {
+    //is there a better way to do this ?
+    this.enableBettingButtons();
+
     this.clear.disabled = true;
     this.confirm.disabled = true;
     this.activePlayer.pot += this.currentBet;
@@ -127,14 +141,17 @@ export default class playersBetController {
   }
 
   confirmBet() {
+    this.enableBettingButtons();
     this.clear.disabled = true;
     this.confirm.disabled = true;
-    let playerHtmlCont = document.querySelector(`#${this.activePlayer.name}`);
-    playerHtmlCont.insertAdjacentHTML(
-      "afterbegin",
-      `Betting: ${this.currentBet}`
-    );
+    this.activePlayer.renderBetValue(this.currentBet);
     this.currentBet = 0;
     this.nextPlayer();
+  }
+
+  enableBettingButtons() {
+    this.bet25.removeAttribute("disabled");
+    this.bet50.removeAttribute("disabled");
+    this.bet100.removeAttribute("disabled");
   }
 }

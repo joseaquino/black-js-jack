@@ -1,6 +1,6 @@
 "use strict";
 
-export default class playerDecisionController {
+export default class PlayerDecisionController {
   constructor(board) {
     if (!Array.isArray(board.players)) {
       throw new Error(
@@ -26,6 +26,7 @@ export default class playerDecisionController {
     this.stand.addEventListener("click", this.standing.bind(this));
 
     this.definePlayerTurn();
+    this.activePlayer = this.players[this.currentPlayerTurn];
   }
 
   controlsHtml() {
@@ -51,10 +52,12 @@ export default class playerDecisionController {
     for (let player of this.players) {
       if (player.handValue === 21) this.currentPlayerTurn++;
       else {
+        this.activePlayer = this.players[this.currentPlayerTurn];
         document
-          .querySelector(`#${this.players[this.currentPlayerTurn].name} .card`)
+          .querySelector(`#${this.activePlayer.name} .card`)
           .classList.add("active");
         if (this.isDealerTurn()) {
+          console.log("hola");
           this.dealerPlay();
         }
         return;
@@ -62,12 +65,8 @@ export default class playerDecisionController {
     }
   }
 
-  hasPlayer21() {
-    return this.players[this.currentPlayerTurn].handValue === 21;
-  }
-
   hasPlayer21OrMore() {
-    return this.players[this.currentPlayerTurn].handValue >= 21;
+    return this.activePlayer.handValue >= 21;
   }
 
   isDealerTurn() {
@@ -82,26 +81,22 @@ export default class playerDecisionController {
     dealer.nextCardToRender = 1;
     dealer.receiveCard(secondCard);
 
-    while (dealer.handValue <= 16) {
+    const mandatoryHittingHandValueLimit = 16;
+
+    while (dealer.handValue <= mandatoryHittingHandValueLimit) {
       this.hitting();
     }
-
-    if (dealer.handValue >= 17) return;
   }
 
   nextPlayer() {
-    document
-      .querySelector(`#${this.players[this.currentPlayerTurn].name}`)
-      .querySelector(".card")
-      .classList.remove("active");
-
+    this.activePlayer.removeFocus();
     this.currentPlayerTurn++;
-    if (this.hasPlayer21OrMore() && !this.isDealerTurn())
-      this.currentPlayerTurn++;
-    document
-      .querySelector(`#${this.players[this.currentPlayerTurn].name}`)
-      .querySelector(".card")
-      .classList.add("active");
+    this.activePlayer = this.players[this.currentPlayerTurn];
+    if (this.hasPlayer21OrMore() && !this.isDealerTurn()) {
+      this.nextPlayer();
+      return;
+    }
+    this.activePlayer.addFocurs();
 
     if (this.isDealerTurn()) {
       this.dealerPlay();
@@ -113,8 +108,10 @@ export default class playerDecisionController {
 
   hitting() {
     const card = this.board.dealCard();
-    this.players[this.currentPlayerTurn].receiveCard(card);
-    if (this.hasPlayer21OrMore() && !this.isDealerTurn()) this.nextPlayer();
+    this.activePlayer.receiveCard(card);
+    if (this.hasPlayer21OrMore() && !this.isDealerTurn()) {
+      this.nextPlayer();
+    }
     return;
   }
 
