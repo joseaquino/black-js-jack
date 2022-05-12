@@ -29,4 +29,8 @@ export default class Deck {
     }
     throw new Error("There are no more cards");
   }
+
+  takeCard() {
+    return this.handsGenerator().next().value;
+  }
 }

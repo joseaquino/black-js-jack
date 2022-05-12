@@ -18,13 +18,13 @@ export default class PlayersBetController {
     <div class='bet-controls'>
         <div class='bet-controls__pot'>Pot: ${this.activePlayer.pot}</div>
         <div class='bet-controls__bet'>Current bet: ${this.currentBet}</div>    
-        <button type='button' class= 'bet-controls__btn btn--25'>
+        <button data-amount="25" type='button' class= 'bet-controls__btn btn--25'>
         25
         </button>
-        <button type='button' class= 'bet-controls__btn btn--50'>
+        <button data-amount="50" type='button' class= 'bet-controls__btn btn--50'>
         50
         </button>
-        <button type='button' class= 'bet-controls__btn btn--100'>
+        <button data-amount="100" type='button' class= 'bet-controls__btn btn--100'>
         100
         </button>    
         <button type='button' disabled class= 'bet-controls__btn btn--clear'>
@@ -79,9 +79,7 @@ export default class PlayersBetController {
 
   updateActivePlayer() {
     this.activePlayer = this.players[this.currentPlayerTurn];
-    document
-      .querySelector(`#${this.activePlayer.name} .card`)
-      .classList.add("active");
+    this.activePlayer.addFocus();
   }
 
   isLastPlayerTurn() {
@@ -90,9 +88,7 @@ export default class PlayersBetController {
   }
 
   nextPlayer() {
-    document
-      .querySelector(`#${this.activePlayer.name} .card`)
-      .classList.remove("active");
+    this.activePlayer.removeFocus();
     if (this.isLastPlayerTurn()) {
       this.betControls.remove();
       this.board.startWithGameDealing();
@@ -118,13 +114,14 @@ export default class PlayersBetController {
     this.currentPotCont.innerHTML = `Pot: ${this.activePlayer.pot}`;
     this.curretBetCont.innerHTML = `Current bet: ${this.currentBet}`;
 
-    switch (true) {
-      case this.activePlayer.pot < 25:
-        this.bet25.setAttribute("disabled", "true");
-      case this.activePlayer.pot < 50:
-        this.bet50.setAttribute("disabled", "true");
-      case this.activePlayer.pot < 100:
-        this.bet100.setAttribute("disabled", "true");
+    if (this.activePlayer.pot < 25) {
+      this.bet25.setAttribute("disabled", "true");
+    }
+    if (this.activePlayer.pot < 50) {
+      this.bet50.setAttribute("disabled", "true");
+    }
+    if (this.activePlayer.pot < 100) {
+      this.bet100.setAttribute("disabled", "true");
     }
   }
 
@@ -150,8 +147,8 @@ export default class PlayersBetController {
   }
 
   enableBettingButtons() {
-    this.bet25.removeAttribute("disabled");
-    this.bet50.removeAttribute("disabled");
-    this.bet100.removeAttribute("disabled");
+    this.betControls
+      .querySelectorAll("[data-amount]")
+      .forEach((button) => button.removeAttribute("disabled"));
   }
 }

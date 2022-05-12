@@ -75,9 +75,7 @@ export default class Player {
   }
 
   renderHandValue() {
-    const sumContainer = document
-      .querySelector(`#${this.name}`)
-      .querySelector(".player__hand-value");
+    const sumContainer = this.domElement.querySelector(".player__hand-value");
     sumContainer.innerHTML = this.handValue.toString();
   }
 
@@ -105,19 +103,16 @@ export default class Player {
   secondDealerCard() {
     const secondCard = this.hand.pop();
     secondCard.flipCard();
-    document.querySelector("#hidden-card").remove();
+    this.domElement.querySelector("#hidden-card").remove();
     return secondCard;
   }
 
-  addFocurs() {
-    document
-      .querySelector(`#${this.name}`)
-      .querySelector(".card")
-      .classList.add("active");
+  addFocus() {
+    this.domElement.querySelector(".card").classList.add("active");
   }
 
   removeFocus() {
-    document.querySelector(`#${this.name} .card`).classList.remove("active");
+    this.domElement.querySelector(".card").classList.remove("active");
   }
 
   removeFromPot(bet) {
@@ -125,7 +120,6 @@ export default class Player {
   }
 
   renderBetValue(bet) {
-    let playerHtmlCont = document.querySelector(`#${this.name}`);
-    playerHtmlCont.insertAdjacentHTML("afterbegin", `Betting: ${bet}`);
+    this.domElement.insertAdjacentHTML("afterbegin", `Betting: ${bet}`);
   }
 }

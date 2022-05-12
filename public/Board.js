@@ -79,8 +79,4 @@ export default class Board {
     this.dealerCont.innerHTML = "";
     this.playersCont.innerHTML = "";
   }
-
-  dealCard() {
-    return this.generatorCardObject.next().value;
-  }
 }

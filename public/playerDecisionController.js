@@ -23,7 +23,7 @@ export default class PlayerDecisionController {
     this.double = this.controlsContainerEle.querySelector(".btn--doubling");
 
     this.hit.addEventListener("click", this.hitting.bind(this));
-    this.stand.addEventListener("click", this.standing.bind(this));
+    this.stand.addEventListener("click", this.nextPlayer.bind(this));
 
     this.definePlayerTurn();
     this.activePlayer = this.players[this.currentPlayerTurn];
@@ -96,7 +96,7 @@ export default class PlayerDecisionController {
       this.nextPlayer();
       return;
     }
-    this.activePlayer.addFocurs();
+    this.activePlayer.addFocus();
 
     if (this.isDealerTurn()) {
       this.dealerPlay();
@@ -107,15 +107,11 @@ export default class PlayerDecisionController {
   }
 
   hitting() {
-    const card = this.board.dealCard();
+    const card = this.board.cardDeck.takeCard();
     this.activePlayer.receiveCard(card);
     if (this.hasPlayer21OrMore() && !this.isDealerTurn()) {
       this.nextPlayer();
     }
     return;
-  }
-
-  standing() {
-    this.nextPlayer();
   }
 }
