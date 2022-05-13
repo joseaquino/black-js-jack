@@ -6,9 +6,7 @@ export default class Deck {
   constructor() {
     const cardsArrGen = [];
     const clubs = ["clubs", "diamonds", "hearts", "spades"];
-    // const cards = ["As", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
-    const cards = ["As", "As", "As", "As", "As", "As", "J", "Q", "K"];
-
+    const cards = ["As", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
     const cardsClubs = clubs.length;
     const differentCards = cards.length;
 
@@ -19,6 +17,8 @@ export default class Deck {
       }
     }
     this.deck = cardsArrGen;
+
+    this.generatorCardObject = this.handsGenerator();
   }
 
   *handsGenerator() {
@@ -31,6 +31,6 @@ export default class Deck {
   }
 
   takeCard() {
-    return this.handsGenerator().next().value;
+    return this.generatorCardObject.next().value;
   }
 }

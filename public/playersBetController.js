@@ -70,9 +70,7 @@ export default class PlayersBetController {
   }
 
   addEventListeners() {
-    this.bet25.addEventListener("click", this.betting.bind(this));
-    this.bet50.addEventListener("click", this.betting.bind(this));
-    this.bet100.addEventListener("click", this.betting.bind(this));
+    this.addingEventListenerToBetButtons();
     this.clear.addEventListener("click", this.clearBet.bind(this));
     this.confirm.addEventListener("click", this.confirmBet.bind(this));
   }
@@ -144,6 +142,14 @@ export default class PlayersBetController {
     this.activePlayer.renderBetValue(this.currentBet);
     this.currentBet = 0;
     this.nextPlayer();
+  }
+
+  addingEventListenerToBetButtons() {
+    this.betControls
+      .querySelectorAll("[data-amount]")
+      .forEach((button) =>
+        button.addEventListener("click", this.betting.bind(this))
+      );
   }
 
   enableBettingButtons() {

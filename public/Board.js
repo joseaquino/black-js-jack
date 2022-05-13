@@ -15,7 +15,6 @@ export default class Board {
     this.boardContainerElem.innerHTML = this.boardHtml();
     this.dealerCont = document.querySelector(".dealer");
     this.playersCont = document.querySelector(".players");
-    this.generatorCardObject = this.cardDeck.handsGenerator();
     this.betController = new PlayersBetController(this);
   }
 
@@ -46,9 +45,7 @@ export default class Board {
 
     for (let i = 0; i < cardsToGive; i++) {
       let playerToGetCard = (i + amountOfPlayers) % amountOfPlayers;
-
-      let card = this.generatorCardObject.next().value;
-
+      let card = this.cardDeck.takeCard();
       const currentPlayerBeingDealt = this.players[playerToGetCard];
 
       if (i === cardsToGive - 1) {
