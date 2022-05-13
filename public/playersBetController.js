@@ -58,9 +58,9 @@ export default class PlayersBetController {
 
   selectDomElements() {
     this.betControls = document.querySelector(".bet-controls");
-    this.bet25 = this.controlsContainerEle.querySelector(".btn--25");
-    this.bet50 = this.controlsContainerEle.querySelector(".btn--50");
-    this.bet100 = this.controlsContainerEle.querySelector(".btn--100");
+    // this.bet25 = this.controlsContainerEle.querySelector(".btn--25");
+    // this.bet50 = this.controlsContainerEle.querySelector(".btn--50");
+    // this.bet100 = this.controlsContainerEle.querySelector(".btn--100");
     this.clear = this.controlsContainerEle.querySelector(".btn--clear");
     this.currentPotCont =
       this.controlsContainerEle.querySelector(".bet-controls__pot");
@@ -112,15 +112,7 @@ export default class PlayersBetController {
     this.currentPotCont.innerHTML = `Pot: ${this.activePlayer.pot}`;
     this.curretBetCont.innerHTML = `Current bet: ${this.currentBet}`;
 
-    if (this.activePlayer.pot < 25) {
-      this.bet25.setAttribute("disabled", "true");
-    }
-    if (this.activePlayer.pot < 50) {
-      this.bet50.setAttribute("disabled", "true");
-    }
-    if (this.activePlayer.pot < 100) {
-      this.bet100.setAttribute("disabled", "true");
-    }
+    this.disablingBetButtons();
   }
 
   clearBet() {
@@ -156,5 +148,13 @@ export default class PlayersBetController {
     this.betControls
       .querySelectorAll("[data-amount]")
       .forEach((button) => button.removeAttribute("disabled"));
+  }
+
+  disablingBetButtons() {
+    this.betControls.querySelectorAll("[data-amount]").forEach((button) => {
+      if (this.activePlayer.pot < Number(button.getAttribute("data-amount"))) {
+        button.setAttribute("disabled", "true");
+      }
+    });
   }
 }
