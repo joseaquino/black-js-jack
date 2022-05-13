@@ -2,7 +2,6 @@
 import Board from "./Board.js";
 import Player from "./Player.js";
 import WelcomeScreen from "./WelcomeScreen.js";
-import { sleepNow } from "./Helpers.js";
 
 const start = () => {
   const container = document.querySelector("#game");
@@ -16,7 +15,7 @@ const start = () => {
   const restartBtn = document.createElement("button");
   restartBtn.innerHTML = "Choose new players";
 
-  const welcomeScreen = new WelcomeScreen( async (players) => {
+  const welcomeScreen = new WelcomeScreen((players) => {
     const game = new Board();
     container.prepend(restartBtn);
     players.forEach((player) => game.addPlayer(new Player(player.name)));
@@ -26,9 +25,7 @@ const start = () => {
     });
     game.createDealer();
 
-    // We will wait some time before dealing the cards to smooth out the transition between the welcome screen and the board
-    await sleepNow(1500);
-    await game.dealCards();
+    game.startWithGameBets();
 
     restartBtn.addEventListener("click", () => {
       game.clearBoard();
