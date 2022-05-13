@@ -58,9 +58,7 @@ export default class PlayersBetController {
 
   selectDomElements() {
     this.betControls = document.querySelector(".bet-controls");
-    // this.bet25 = this.controlsContainerEle.querySelector(".btn--25");
-    // this.bet50 = this.controlsContainerEle.querySelector(".btn--50");
-    // this.bet100 = this.controlsContainerEle.querySelector(".btn--100");
+    this.betButtons = this.betControls.querySelectorAll("[data-amount]");
     this.clear = this.controlsContainerEle.querySelector(".btn--clear");
     this.currentPotCont =
       this.controlsContainerEle.querySelector(".bet-controls__pot");
@@ -137,21 +135,17 @@ export default class PlayersBetController {
   }
 
   addingEventListenerToBetButtons() {
-    this.betControls
-      .querySelectorAll("[data-amount]")
-      .forEach((button) =>
-        button.addEventListener("click", this.betting.bind(this))
-      );
+    this.betButtons.forEach((button) =>
+      button.addEventListener("click", this.betting.bind(this))
+    );
   }
 
   enableBettingButtons() {
-    this.betControls
-      .querySelectorAll("[data-amount]")
-      .forEach((button) => button.removeAttribute("disabled"));
+    this.betButtons.forEach((button) => button.removeAttribute("disabled"));
   }
 
   disablingBetButtons() {
-    this.betControls.querySelectorAll("[data-amount]").forEach((button) => {
+    this.betButtons.forEach((button) => {
       if (this.activePlayer.pot < Number(button.getAttribute("data-amount"))) {
         button.setAttribute("disabled", "true");
       }
