@@ -1,7 +1,7 @@
 "use strict";
 import { sleepNow } from "./Helpers.js";
 
-export default class PlayerDecisionController {
+class PlayerDecisionController {
   constructor(board) {
     if (!Array.isArray(board.players)) {
       throw new Error(
@@ -30,11 +30,8 @@ export default class PlayerDecisionController {
     this.double.addEventListener("click", this.doublingDown);
     this.split.addEventListener("click", this.splitting);
 
-    this.players = players;
-    this.amountOfPlayers = this.players.length;
-    this.generatorCardObject = generatorCardObject;
     this.currentPlayerTurn = this.definePlayerTurn();
-    
+
     this.definePlayerTurn();
     this.activePlayer = this.players[this.currentPlayerTurn];
   }
@@ -57,34 +54,32 @@ export default class PlayerDecisionController {
   </div>`;
   }
 
-  definePlayerTurn() {
-    this.currentPlayerTurn = 0;
-    for (let player of this.players) {
-      if (player.handValue === 21) this.currentPlayerTurn++;
-      else {
-        this.activePlayer = this.players[currentPlayerTurn];
-        if (this.haveSameValuePlayerCards()) {
-          this.split.removeAttribute("disabled");
-        }
-        document
-          .querySelector(`#${this.activePlayer.name} .card`)
-          .classList.add("active");
-        if (this.isDealerTurn()) {
-          console.log("hola");
-          this.dealerPlay();
-        }
-        return;
-      }
-    }
-  }
+  // definePlayerTurn() {
+  //   this.currentPlayerTurn = 0;
+  //   for (let player of this.players) {
+  //     if (player.handValue === 21) this.currentPlayerTurn++;
+  //     else {
+  //       this.activePlayer = this.players[this.currentPlayerTurn];
+  //       if (this.haveSameValuePlayerCards()) {
+  //         this.split.removeAttribute("disabled");
+  //       }
+  //       document
+  //         .querySelector(`#${this.activePlayer.name} .card`)
+  //         .classList.add("active");
+  //       if (this.isDealerTurn()) {
+  //         console.log("hola");
+  //         this.dealerPlay();
+  //       }
+  //       return;
+  //     }
+  //   }
+  // }
 
   haveSameValuePlayerCards() {
     return this.activePlayer.hand[0].value === this.activePlayer.hand[0].value;
   }
 
-  
-
-  hasPlayerMoreThan21() {
+  hasPlayer21OrMore() {
     return this.activePlayer.handValue >= 21;
   }
 
@@ -92,21 +87,21 @@ export default class PlayerDecisionController {
     return this.currentPlayerTurn === this.amountOfPlayers - 1;
   }
 
-  dealerPlay() {
-    this.double.setAttribute("disabled", "true");
-    this.stand.setAttribute("disabled", "true");
-    this.hit.setAttribute("disabled", "true");
-    const dealer = this.players[this.amountOfPlayers - 1];
-    const secondCard = dealer.secondDealerCard();
-    dealer.nextCardToRender = 1;
-    dealer.receiveCard(secondCard);
+  // dealerPlay() {
+  //   this.double.setAttribute("disabled", "true");
+  //   this.stand.setAttribute("disabled", "true");
+  //   this.hit.setAttribute("disabled", "true");
+  //   const dealer = this.players[this.amountOfPlayers - 1];
+  //   const secondCard = dealer.secondDealerCard();
+  //   dealer.nextCardToRender = 1;
+  //   dealer.receiveCard(secondCard);
 
-    const mandatoryHittingHandValueLimit = 16;
+  //   const mandatoryHittingHandValueLimit = 16;
 
-    while (dealer.handValue <= mandatoryHittingHandValueLimit) {
-      this.hitting();
-    }
-  }
+  //   while (dealer.handValue <= mandatoryHittingHandValueLimit) {
+  //     this.hitting();
+  //   }
+  // }
 
   nextPlayer() {
     if (this.activePlayer.playerPlayedBothHands)
@@ -129,23 +124,8 @@ export default class PlayerDecisionController {
     }
     this.double.removeAttribute("disabled");
     this.split.removeAttribute("disabled");
-    document
-      .querySelector(`#${this.activePlayer.name}`)
-      .querySelector(".card")
-      .classList.remove("active");
-
-    this.currentPlayerTurn++;
-    this.activePlayer = this.players[this.currentPlayerTurn];
-    if (this.hasPlayer21() && !this.isDealerTurn()) this.currentPlayerTurn++;
-    document
-      .querySelector(`#${this.activePlayer.name}`)
-      .querySelector(".card")
-      .classList.add("active");
-
-      //revisar
-
-    nextPlayer() {
     this.activePlayer.removeFocus();
+
     this.currentPlayerTurn++;
     this.activePlayer = this.players[this.currentPlayerTurn];
     if (this.hasPlayer21OrMore() && !this.isDealerTurn()) {
@@ -158,12 +138,6 @@ export default class PlayerDecisionController {
       this.dealerPlay();
       return;
     }
-
-    return;
-  }
-
-  dealCard() {
-    return this.generatorCardObject.next().value;
   }
 
   doublingDown = async () => {
@@ -194,7 +168,7 @@ export default class PlayerDecisionController {
   hitting(fromDoubling) {
     this.double.setAttribute("disabled", "true");
     this.split.setAttribute("disabled", "true");
-    const card = this.dealCard();
+    const card = this.board.cardDeck.takeCard();
     if (this.activePlayer.splitedCards) {
       this.activePlayer.receiveCardforSplittedHand(card);
       return;
@@ -203,15 +177,10 @@ export default class PlayerDecisionController {
     this.activePlayer.receiveCard(card);
 
     if (
-      (this.hasPlayerMoreThan21() || this.hasPlayer21()) &&
+      this.hasPlayer21OrMore() &&
       !this.isDealerTurn() &&
       fromDoubling !== true
-    )
-    //left
-  hitting() {
-    const card = this.board.cardDeck.takeCard();
-    this.activePlayer.receiveCard(card);
-    if (this.hasPlayer21OrMore() && !this.isDealerTurn()) {
+    ) {
       this.nextPlayer();
     }
     return;
@@ -228,7 +197,7 @@ export default class PlayerDecisionController {
     this.double.setAttribute("disabled", "true");
 
     this.activePlayer.splitedCards = true;
-    this.fromSplittig = true;
+    // this.fromSplittig = true;
 
     this.removeValueOfOriginalHandWhenSplitting();
     this.cardSplitting();
@@ -310,3 +279,5 @@ export default class PlayerDecisionController {
     sumContainerHand2.innerHTML = this.activePlayer.hand2Value;
   };
 }
+
+//estos so los jugadores que tengo y esto le podes consultar

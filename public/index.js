@@ -18,7 +18,7 @@ const start = () => {
   const welcomeScreen = new WelcomeScreen((players) => {
     const game = new Board();
     container.prepend(restartBtn);
-    players.forEach((player) => game.addPlayer(new Player(player.name)));
+    players.forEach((player) => game.addPlayer(new Player(player.name, game)));
 
     game.players.forEach((player) => {
       player.renderPlayer();
