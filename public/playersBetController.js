@@ -68,7 +68,7 @@ export default class PlayersBetController {
   }
 
   addEventListeners() {
-    this.addingEventListenerToBetButtons();
+    this.addEventListenerToBetButtons();
     this.clear.addEventListener("click", this.clearBet.bind(this));
     this.confirm.addEventListener("click", this.confirmBet.bind(this));
   }
@@ -76,6 +76,11 @@ export default class PlayersBetController {
   updateActivePlayer() {
     this.activePlayer = this.players[this.currentPlayerTurn];
     this.activePlayer.addFocus();
+  }
+
+  isLastPlayerTurn() {
+    const lastPlayerPosition = this.players.length - 2;
+    return lastPlayerPosition === this.currentPlayerTurn;
   }
 
   isLastPlayerTurn() {
@@ -96,7 +101,7 @@ export default class PlayersBetController {
     }
   }
 
-  betting(e) {
+  placeBet(e) {
     this.clear.disabled = false;
     this.confirm.disabled = false;
     const betAddition = e.target.innerText;
@@ -114,8 +119,7 @@ export default class PlayersBetController {
   }
 
   clearBet() {
-    //is there a better way to do this ?
-    this.enableBettingButtons();
+    this.enableBetButtons();
 
     this.clear.disabled = true;
     this.confirm.disabled = true;
@@ -126,7 +130,7 @@ export default class PlayersBetController {
   }
 
   confirmBet() {
-    this.enableBettingButtons();
+    this.enableBetButtons();
     this.clear.disabled = true;
     this.confirm.disabled = true;
     this.activePlayer.renderBetValue(this.currentBet);
@@ -134,13 +138,13 @@ export default class PlayersBetController {
     this.nextPlayer();
   }
 
-  addingEventListenerToBetButtons() {
+  addEventListenerToBetButtons() {
     this.betButtons.forEach((button) =>
-      button.addEventListener("click", this.betting.bind(this))
+      button.addEventListener("click", this.placeBet.bind(this))
     );
   }
 
-  enableBettingButtons() {
+  enableBetButtons() {
     this.betButtons.forEach((button) => button.removeAttribute("disabled"));
   }
 
