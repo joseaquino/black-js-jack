@@ -28,7 +28,12 @@ export default class Board {
   }
 
   createDealer() {
-    const dealer = new Player("Dealer", this, 2000000, "Dealer");
+    const dealer = new Player({
+      name: "Dealer",
+      board: this,
+      pot: 2000000,
+      playerType: "Dealer",
+    });
     dealer.renderPlayerHtml(".dealer");
     //Storing player1 inside players array
     this.addPlayer(dealer);
@@ -69,9 +74,9 @@ export default class Board {
 
   letPlayersPlay() {
     this.currentPlayerTurn = 0;
-    this.activePlayer = this.players[this.currentPlayerTurn];
     this.updateActivePlayer();
-    this.activePlayer.playHands.checkHand();
+
+    this.activePlayer.checkHand();
   }
 
   clearBoard() {
@@ -79,33 +84,33 @@ export default class Board {
     this.playersCont.innerHTML = "";
   }
 
-  //CHAGEEEEEES
-
   nextPlayerWhenPlayingCards() {
     //
-    if (this.activePlayer.playerPlayedBothHands)
+    if (this.activePlayer.playerPlayedAllHands)
       this.activePlayer.removeFocusForSecondSplittedCard();
 
     if (
-      this.activePlayer.splitedCards &&
-      !this.activePlayer.playerPlayedBothHands
+      this.activePlayer.hasSplitCards() &&
+      !this.activePlayer.playerPlayedAllHands
     ) {
       this.activePlayer.removeFocusForFirstSplittedCard();
       this.activePlayer.addFocusForSecondSplittedCard();
-      this.activePlayer.playerPlayedBothHands = true;
+      this.activePlayer.hasPlayedAllHands();
       return;
     }
-    this.activePlayer.playHands.enableDoubleAndSplit();
+
+    this.activePlayer.enableDoubleAndSplit();
     //
 
-    this.activePlayer.playHands.finishPlayerTurn();
+    this.activePlayer.removePlayerControls();
+
     this.activePlayer.removeFocus();
     this.currentPlayerTurn++;
     this.updateActivePlayer();
     if (this.isDealerTurn()) {
       this.dealerPlay();
     } else {
-      this.activePlayer.playHands.checkHand();
+      this.activePlayer.checkHand();
     }
   }
 
