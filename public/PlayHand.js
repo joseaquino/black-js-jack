@@ -4,10 +4,16 @@ import { sleepNow } from "./Helpers.js";
 export default class PlayHand {
   constructor(player) {
     this.player = player;
-    this.controlsContainerEle = document.querySelector("#game");
+    this.controlsContainerEle = this.player.board.boardContainerElem;
     this.hasSplitCards = false;
+    this.hand = [];
+    this.secondHand = [];
+    this.nextCardToRenderHand1 = 0; 
+    this.nextCardToRenderHand2 = 0;
+    this.hand1Value = 0; 
+    this.hand2Value = 0; 
   }
-
+    
   rendnerControls() {
     this.controlsContainerEle.insertAdjacentHTML(
       "beforeend",
@@ -59,10 +65,6 @@ export default class PlayHand {
   }
 
   checkHand() {
-    if (this.hasPlayer21OrMore()) {
-      this.player.finishTurn();
-      return;
-    }
     this.setUpPlayerControls();
     if (this.havePlayerCardsSameValue()) {
       this.split.removeAttribute("disabled");
@@ -74,8 +76,8 @@ export default class PlayHand {
   }
 
   havePlayerCardsSameValue() {
-    const firstPlayerCardValue = this.player.hand[0].value;
-    const secondPlayerCardValue = this.player.hand[1].value;
+    const firstPlayerCardValue = this.hand[0].value;
+    const secondPlayerCardValue = this.hand[1].value;
     return firstPlayerCardValue === secondPlayerCardValue;
   }
 
@@ -85,7 +87,7 @@ export default class PlayHand {
 
     const card = this.player.askForCard();
     if (this.hasSplitCards) {
-      this.player.receiveCardforSplittedHand(card);
+      this.player.receiveCardforSplitHand(card);
       return;
     }
 
@@ -142,10 +144,10 @@ export default class PlayHand {
   //some important changes
 
   createSplitHandProperties() {
-    this.secondHand = this.player.hand.splice(-1);
+    this.secondHand = this.hand.splice(-1);
     this.nextCardToRenderHand1 = 1;
     this.nextCardToRenderHand2 = 1;
-    this.hand1Value = this.player.hand[0].value;
+    this.hand1Value = this.hand[0].value;
     this.hand2Value = this.secondHand[0].value;
   }
 
@@ -218,14 +220,9 @@ export default class PlayHand {
     this.player.finishTurn();
   };
 
-  removePlayerControls() {
+  removePlayerHandControls() {
     this.controlsContainerEle.querySelector(".player-controls")?.remove();
   }
-
-  enableDoubleAndSplit = () => {
-    this.double?.removeAttribute("disabled");
-    this.split?.removeAttribute("disabled");
-  };
 
   //  Most recent changes
   sumOfCards() {
@@ -234,7 +231,7 @@ export default class PlayHand {
     if (this.player.playerPlayedAllHands) {
       hand = this.secondHand;
     } else {
-      hand = this.player.hand;
+      hand = this.hand;
     }
 
     let sumOfHand = 0;
@@ -311,7 +308,7 @@ export default class PlayHand {
     if (this.player.playerPlayedAllHands) {
       cardToRender = this.secondHand[this.nextCardToRenderHand2];
     } else {
-      cardToRender = this.player.hand[this.nextCardToRenderHand1];
+      cardToRender = this.hand[this.nextCardToRenderHand1];
     }
     let htmlString = `<p>${cardToRender.number} of ${cardToRender.suit} <i class="${cardToRender.icon}  "></i></p>`;
 
@@ -326,9 +323,9 @@ export default class PlayHand {
   }
 
   renderNextCard() {
-    if (this.player.nextCardToRender > this.player.hand.length - 1) return;
+    if (this.player.nextCardToRender > this.hand.length - 1) return;
     let htmlString = "";
-    const cardToRender = this.player.hand[this.player.nextCardToRender];
+    const cardToRender = this.hand[this.player.nextCardToRender];
     if (cardToRender.faceDirection === "down") {
       htmlString = '<p id="hidden-card">Card down</p>';
     } else {

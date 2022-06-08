@@ -57,7 +57,8 @@ export default class PlayersBetController {
   }
 
   selectDomElements() {
-    this.betControls = document.querySelector(".bet-controls");
+    this.betControls =
+      this.board.boardContainerElem.querySelector(".bet-controls");
     this.betButtons = this.betControls.querySelectorAll("[data-amount]");
     this.clear = this.controlsContainerEle.querySelector(".btn--clear");
     this.currentPotCont =
@@ -76,11 +77,6 @@ export default class PlayersBetController {
   updateActivePlayer() {
     this.activePlayer = this.players[this.currentPlayerTurn];
     this.activePlayer.addFocus();
-  }
-
-  isLastPlayerTurn() {
-    const lastPlayerPosition = this.players.length - 2;
-    return lastPlayerPosition === this.currentPlayerTurn;
   }
 
   isLastPlayerTurn() {

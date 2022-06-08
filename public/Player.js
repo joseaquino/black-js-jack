@@ -5,15 +5,16 @@ import PlayHand from "./PlayHand.js";
 export default class Player {
   domElement = null;
 
-  constructor(confingObject) {
-    this.hand = [];
-    this.name = confingObject.name;
-    this.pot = confingObject.pot;
-    this.playerType = confingObject.playerType;
+  constructor(playerConfig) {
+    this.name = playerConfig.name;
+    this.pot = playerConfig.pot;
+    this.playerType = playerConfig.playerType;
     this.nextCardToRender = 0;
     this.bet = 0;
-    this.board = confingObject.board;
+    this.board = playerConfig.board;
     this.playHand = new PlayHand(this);
+    this.playerPlayedAllHands = false;
+    this.hasFinishedTurn = false;
   }
 
   renderPlayer() {
@@ -34,23 +35,24 @@ export default class Player {
 
   renderPlayerHtml(containerElement) {
     if (this.domElement) return;
-    const htmlPlayersContainer = document.querySelector(containerElement);
+    const htmlPlayersContainer =
+      this.board.boardContainerElem.querySelector(containerElement);
     htmlPlayersContainer.insertAdjacentHTML("afterbegin", this.playerHtml());
     this.domElement = htmlPlayersContainer.querySelector(`#${this.name}`);
   }
 
   receiveCard = (card) => {
-    this.hand.push(card);
+    this.playHand.hand.push(card);
     this.playHand.renderNextCard();
     this.playHand.sumOfCards();
     this.playHand.renderHandValue();
   };
 
-  receiveCardforSplittedHand(card) {
+  receiveCardforSplitHand(card) {
     if (this.playerPlayedAllHands) {
       this.playHand.secondHand.push(card);
     } else {
-      this.hand.push(card);
+      this.playHand.hand.push(card);
     }
     this.playHand.renderCardWhenPlayerHasSplit();
     this.playHand.sumOfCards();
@@ -69,7 +71,7 @@ export default class Player {
   }
 
   secondDealerCard() {
-    const secondCard = this.hand.pop();
+    const secondCard = this.playHand.hand.pop();
     secondCard.flipCard();
     this.domElement.querySelector("#hidden-card").remove();
     return secondCard;
@@ -79,7 +81,7 @@ export default class Player {
     this.domElement.querySelector(".card").classList.add("active");
   }
 
-  addFocusForSecondSplittedCard() {
+  addFocusForSecondSplitCard() {
     this.domElement
       .querySelector(`#${this.name} .card`)
       .lastElementChild.classList.add("active");
@@ -89,13 +91,13 @@ export default class Player {
     this.domElement.querySelector(".card").classList.remove("active");
   }
 
-  removeFocusForFirstSplittedCard() {
+  removeFocusForFirstSplitCard() {
     this.domElement
       .querySelector(`#${this.name} .card`)
       .firstElementChild.classList.remove("active");
   }
 
-  removeFocusForSecondSplittedCard() {
+  removeFocusForSecondSplitCard() {
     this.domElement
       .querySelector(`#${this.name} .card`)
       .lastElementChild.classList.remove("active");
@@ -111,13 +113,14 @@ export default class Player {
     ).innerHTML = `Betting: ${bet}`;
   }
 
-  hasPlayedAllHands() {
+  setAllHandsAsPlayed() {
     this.playerPlayedAllHands = true;
   }
 
   //To communicate PlayHand with Board
 
   finishTurn() {
+    this.hasFinishedTurn = true;
     this.board.nextPlayerWhenPlayingCards();
   }
 
@@ -132,6 +135,10 @@ export default class Player {
   //To communicate Board with PlayHand
 
   checkHand() {
+    if (this.playHand.hasPlayer21OrMore()) {
+      this.hasFinishedTurn = true;
+      return;
+    }
     this.playHand.checkHand();
   }
 
@@ -139,11 +146,7 @@ export default class Player {
     return this.playHand.hasSplitCards;
   }
 
-  enableDoubleAndSplit() {
-    this.playHand.enableDoubleAndSplit();
-  }
-
-  removePlayerControls() {
-    this.playHand.removePlayerControls();
+  removePlayerHandControls() {
+    this.playHand.removePlayerHandControls();
   }
 }

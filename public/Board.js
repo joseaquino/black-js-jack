@@ -15,6 +15,7 @@ export default class Board {
     this.dealerCont = document.querySelector(".dealer");
     this.playersCont = document.querySelector(".players");
     this.betController = new PlayersBetController(this);
+    this.activePlayer = this.players[0];
   }
 
   boardHtml() {
@@ -87,31 +88,37 @@ export default class Board {
   nextPlayerWhenPlayingCards() {
     //
     if (this.activePlayer.playerPlayedAllHands)
-      this.activePlayer.removeFocusForSecondSplittedCard();
+      this.activePlayer.removeFocusForSecondSplitCard();
 
     if (
       this.activePlayer.hasSplitCards() &&
       !this.activePlayer.playerPlayedAllHands
     ) {
-      this.activePlayer.removeFocusForFirstSplittedCard();
-      this.activePlayer.addFocusForSecondSplittedCard();
-      this.activePlayer.hasPlayedAllHands();
+      this.endFirstSplitCardTurn();
       return;
     }
 
-    this.activePlayer.enableDoubleAndSplit();
-    //
+    this.endPlayerHandTurn();
 
-    this.activePlayer.removePlayerControls();
-
-    this.activePlayer.removeFocus();
     this.currentPlayerTurn++;
     this.updateActivePlayer();
     if (this.isDealerTurn()) {
       this.dealerPlay();
     } else {
       this.activePlayer.checkHand();
+      if (this.activePlayer.hasFinishedTurn) this.nextPlayerWhenPlayingCards();
     }
+  }
+
+  endPlayerHandTurn() {
+    this.activePlayer.removePlayerHandControls();
+    this.activePlayer.removeFocus();
+  }
+
+  endFirstSplitCardTurn() {
+    this.activePlayer.removeFocusForFirstSplitCard();
+    this.activePlayer.addFocusForSecondSplitCard();
+    this.activePlayer.setAllHandsAsPlayed();
   }
 
   updateActivePlayer() {
