@@ -1,16 +1,20 @@
 "use strict";
 //this class is going to create the players
+import PlayHand from "./PlayHand.js";
 
 export default class Player {
   domElement = null;
 
-  constructor(name, pot = 200, playerType = "GuestPlayer") {
-    this.hand = [];
-    this.name = name;
-    this.pot = pot;
-    this.playerType = playerType;
+  constructor(playerConfig) {
+    this.name = playerConfig.name;
+    this.pot = playerConfig.pot;
+    this.playerType = playerConfig.playerType;
     this.nextCardToRender = 0;
     this.bet = 0;
+    this.board = playerConfig.board;
+    this.playHand = new PlayHand(this);
+    this.playerPlayedAllHands = false;
+    this.hasFinishedTurn = false;
   }
 
   renderPlayer() {
@@ -20,88 +24,54 @@ export default class Player {
   playerHtml() {
     return `
     <div class="player" id="${this.name}">
+      <div class='player__bet-value'></div>
       <h2 class="player-heading">${this.name}</h2>
       <div class="card"></div>
       <div class='player__hand-value'></div>
-      <div class='player__bet-value'></div>
-    </div>
+      </div>
     
     `;
   }
 
   renderPlayerHtml(containerElement) {
     if (this.domElement) return;
-    const htmlPlayersContainer = document.querySelector(containerElement);
+    const htmlPlayersContainer =
+      this.board.boardContainerElem.querySelector(containerElement);
     htmlPlayersContainer.insertAdjacentHTML("afterbegin", this.playerHtml());
     this.domElement = htmlPlayersContainer.querySelector(`#${this.name}`);
   }
 
-  sumOfCards() {
-    let sumOfHand = 0;
+  receiveCard = (card) => {
+    this.playHand.hand.push(card);
+    this.playHand.renderNextCard();
+    this.playHand.sumOfCards();
+    this.playHand.renderHandValue();
+  };
 
-    const [arrOfCardsWithFixedValues, arrOfCardsWithAlternateValues] =
-      this.hand.reduce(
-        ([arrOfCardsWithFixedValues, arrOfCardsWithAlternateValues], card) => {
-          if (card.alternateValue) {
-            arrOfCardsWithAlternateValues.push(card);
-          } else {
-            arrOfCardsWithFixedValues.push(card);
-          }
-          return [arrOfCardsWithFixedValues, arrOfCardsWithAlternateValues];
-        },
-        [[], []]
-      );
-
-    let amountOfAces = arrOfCardsWithAlternateValues.length;
-
-    for (let card of arrOfCardsWithFixedValues) {
-      if (card.faceDirection === "down") break;
-      sumOfHand += card.value;
-    }
-
-    if (amountOfAces !== 0) {
-      for (let card of arrOfCardsWithAlternateValues) {
-        if (card.faceDirection === "down") break;
-        if (sumOfHand + card.value > 21) {
-          sumOfHand += card.alternateValue;
-        } else {
-          sumOfHand += card.value;
-        }
-      }
-    }
-
-    this.handValue = sumOfHand;
-    return;
-  }
-
-  renderHandValue() {
-    const sumContainer = this.domElement.querySelector(".player__hand-value");
-    sumContainer.innerHTML = this.handValue.toString();
-  }
-
-  receiveCard(card) {
-    this.hand.push(card);
-    this.renderNextCard();
-    this.sumOfCards();
-    this.renderHandValue();
-  }
-
-  renderNextCard() {
-    if (this.nextCardToRender > this.hand.length - 1) return;
-    let htmlString = "";
-    const cardToRender = this.hand[this.nextCardToRender];
-    if (cardToRender.faceDirection === "down") {
-      htmlString = '<p id="hidden-card">Card down</p>';
+  receiveCardforSplitHand(card) {
+    if (this.playerPlayedAllHands) {
+      this.playHand.secondHand.push(card);
     } else {
-      htmlString += `<p>${cardToRender.number} of ${cardToRender.suit} <i class="${cardToRender.icon}  "></i></p>`;
+      this.playHand.hand.push(card);
     }
-    const cardContainerElem = this.domElement.querySelector(".card");
-    cardContainerElem.insertAdjacentHTML("afterbegin", htmlString);
-    this.nextCardToRender++;
+    this.playHand.renderCardWhenPlayerHasSplit();
+    this.playHand.sumOfCards();
+    this.playHand.renderHandValueWhenPlayerHasSplit();
+
+    const handValueLimit = 21;
+
+    if (
+      !this.playerPlayedAllHands &&
+      this.playHand.hand1Value >= handValueLimit
+    )
+      this.board.nextPlayerWhenPlayingCards();
+
+    if (this.playerPlayedAllHands && this.playHand.hand2Value >= handValueLimit)
+      this.board.nextPlayerWhenPlayingCards();
   }
 
   secondDealerCard() {
-    const secondCard = this.hand.pop();
+    const secondCard = this.playHand.hand.pop();
     secondCard.flipCard();
     this.domElement.querySelector("#hidden-card").remove();
     return secondCard;
@@ -111,8 +81,26 @@ export default class Player {
     this.domElement.querySelector(".card").classList.add("active");
   }
 
+  addFocusForSecondSplitCard() {
+    this.domElement
+      .querySelector(`#${this.name} .card`)
+      .lastElementChild.classList.add("active");
+  }
+
   removeFocus() {
     this.domElement.querySelector(".card").classList.remove("active");
+  }
+
+  removeFocusForFirstSplitCard() {
+    this.domElement
+      .querySelector(`#${this.name} .card`)
+      .firstElementChild.classList.remove("active");
+  }
+
+  removeFocusForSecondSplitCard() {
+    this.domElement
+      .querySelector(`#${this.name} .card`)
+      .lastElementChild.classList.remove("active");
   }
 
   removeFromPot(bet) {
@@ -120,6 +108,45 @@ export default class Player {
   }
 
   renderBetValue(bet) {
-    this.domElement.insertAdjacentHTML("afterbegin", `Betting: ${bet}`);
+    this.domElement.querySelector(
+      ".player__bet-value"
+    ).innerHTML = `Betting: ${bet}`;
+  }
+
+  setAllHandsAsPlayed() {
+    this.playerPlayedAllHands = true;
+  }
+
+  //To communicate PlayHand with Board
+
+  finishTurn() {
+    this.hasFinishedTurn = true;
+    this.board.nextPlayerWhenPlayingCards();
+  }
+
+  askForCard() {
+    return this.board.cardDeck.takeCard();
+  }
+
+  isDealerTurn() {
+    return this.board.isDealerTurn();
+  }
+
+  //To communicate Board with PlayHand
+
+  checkHand() {
+    if (this.playHand.hasPlayer21OrMore()) {
+      this.hasFinishedTurn = true;
+      return;
+    }
+    this.playHand.checkHand();
+  }
+
+  hasSplitCards() {
+    return this.playHand.hasSplitCards;
+  }
+
+  removePlayerHandControls() {
+    this.playHand.removePlayerHandControls();
   }
 }
