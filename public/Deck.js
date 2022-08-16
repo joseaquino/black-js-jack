@@ -19,6 +19,8 @@ export default class Deck {
       }
     }
     this.deck = cardsArrGen;
+
+    this.generatorCardObject = this.handsGenerator();
   }
 
   *handsGenerator() {
@@ -28,5 +30,9 @@ export default class Deck {
       this.deck.splice(randomIndex, 1);
     }
     throw new Error("There are no more cards");
+  }
+
+  takeCard() {
+    return this.generatorCardObject.next().value;
   }
 }

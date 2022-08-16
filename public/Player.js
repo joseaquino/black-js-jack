@@ -1,17 +1,20 @@
 "use strict";
 //this class is going to create the players
+import PlayHand from "./PlayHand.js";
 
 export default class Player {
   domElement = null;
 
-  constructor(name, pot = 500, playerType = "GuestPlayer") {
-    this.hand = [];
-    this.name = name;
-    this.pot = pot;
-    this.playerType = playerType;
+  constructor(playerConfig) {
+    this.name = playerConfig.name;
+    this.pot = playerConfig.pot;
+    this.playerType = playerConfig.playerType;
     this.nextCardToRender = 0;
     this.bet = 0;
-    this.splitedCards = false;
+    this.board = playerConfig.board;
+    this.playHand = new PlayHand(this);
+    this.playerPlayedAllHands = false;
+    this.hasFinishedTurn = false;
   }
 
   renderPlayer() {
@@ -32,173 +35,119 @@ export default class Player {
 
   renderPlayerHtml(containerElement) {
     if (this.domElement) return;
-    const htmlPlayersContainer = document.querySelector(containerElement);
+    const htmlPlayersContainer =
+      this.board.boardContainerElem.querySelector(containerElement);
     htmlPlayersContainer.insertAdjacentHTML("afterbegin", this.playerHtml());
     this.domElement = htmlPlayersContainer.querySelector(`#${this.name}`);
   }
 
-  initialBet() {}
+  receiveCard = (card) => {
+    this.playHand.hand.push(card);
+    this.playHand.renderNextCard();
+    this.playHand.sumOfCards();
+    this.playHand.renderHandValue();
+  };
 
-  playerBetValurHtml() {
-    return `
-    Apuesta:${this.betValue}
-    `;
+  receiveCardforSplitHand(card) {
+    if (this.playerPlayedAllHands) {
+      this.playHand.secondHand.push(card);
+    } else {
+      this.playHand.hand.push(card);
+    }
+    this.playHand.renderCardWhenPlayerHasSplit();
+    this.playHand.sumOfCards();
+    this.playHand.renderHandValueWhenPlayerHasSplit();
+
+    const handValueLimit = 21;
+
+    if (
+      !this.playerPlayedAllHands &&
+      this.playHand.hand1Value >= handValueLimit
+    )
+      this.board.nextPlayerWhenPlayingCards();
+
+    if (this.playerPlayedAllHands && this.playHand.hand2Value >= handValueLimit)
+      this.board.nextPlayerWhenPlayingCards();
   }
 
-  renderBetValue() {}
+  secondDealerCard() {
+    const secondCard = this.playHand.hand.pop();
+    secondCard.flipCard();
+    this.domElement.querySelector("#hidden-card").remove();
+    return secondCard;
+  }
 
-  sumOfCards() {
-    let hand;
+  addFocus() {
+    this.domElement.querySelector(".card").classList.add("active");
+  }
 
-    switch (true) {
-      case this.playerPlayedBothHands:
-        hand = this.secondHand;
-        break;
-      default:
-        hand = this.hand;
-    }
+  addFocusForSecondSplitCard() {
+    this.domElement
+      .querySelector(`#${this.name} .card`)
+      .lastElementChild.classList.add("active");
+  }
 
-    let sumOfHand = 0;
+  removeFocus() {
+    this.domElement.querySelector(".card").classList.remove("active");
+  }
 
-    const arrOfCardsWithFixedValues = hand.filter(
-      (card) => !card.alternateValue
-    );
+  removeFocusForFirstSplitCard() {
+    this.domElement
+      .querySelector(`#${this.name} .card`)
+      .firstElementChild.classList.remove("active");
+  }
 
-    const arrOfCardsWithAlternateValues = hand.filter(
-      (card) => card.alternateValue
-    );
+  removeFocusForSecondSplitCard() {
+    this.domElement
+      .querySelector(`#${this.name} .card`)
+      .lastElementChild.classList.remove("active");
+  }
 
-    let amountOfAces = arrOfCardsWithAlternateValues.length;
-    let alternateValuesUsed = 0;
-    const amountReducedIfAceChangesTo1 = 10;
+  removeFromPot(bet) {
+    this.pot -= bet;
+  }
 
-    for (let card of arrOfCardsWithFixedValues) {
-      if (card.faceDirection === "down") break;
-      sumOfHand += card.value;
-    }
+  renderBetValue(bet) {
+    this.domElement.querySelector(
+      ".player__bet-value"
+    ).innerHTML = `Betting: ${bet}`;
+  }
 
-    if (amountOfAces === 0) {
-      switch (true) {
-        case this.playerPlayedBothHands:
-          this.hand2Value = sumOfHand;
-          break;
-        case this.splitedCards:
-          this.hand1Value = sumOfHand;
-          break;
-        default:
-          this.handValue = sumOfHand;
-      }
+  setAllHandsAsPlayed() {
+    this.playerPlayedAllHands = true;
+  }
 
+  //To communicate PlayHand with Board
+
+  finishTurn() {
+    this.hasFinishedTurn = true;
+    this.board.nextPlayerWhenPlayingCards();
+  }
+
+  askForCard() {
+    return this.board.cardDeck.takeCard();
+  }
+
+  isDealerTurn() {
+    return this.board.isDealerTurn();
+  }
+
+  //To communicate Board with PlayHand
+
+  checkHand() {
+    if (this.playHand.hasPlayer21OrMore()) {
+      this.hasFinishedTurn = true;
       return;
     }
-    // debugger;
-    for (let card of arrOfCardsWithAlternateValues) {
-      if (card.faceDirection === "down") break;
-      if (sumOfHand + card.value > 21) {
-        sumOfHand = sumOfHand + card.alternateValue;
-        alternateValuesUsed++;
-      } else {
-        sumOfHand = sumOfHand + card.value;
-      }
-
-      if (sumOfHand > 21 && alternateValuesUsed < amountOfAces) {
-        sumOfHand -= amountReducedIfAceChangesTo1;
-        alternateValuesUsed++;
-      }
-    }
-
-    switch (true) {
-      case this.playerPlayedBothHands:
-        this.hand2Value = sumOfHand;
-        break;
-      case this.splitedCards:
-        this.hand1Value = sumOfHand;
-        break;
-      default:
-        this.handValue = sumOfHand;
-    }
-
-    return;
+    this.playHand.checkHand();
   }
 
-  playerHandValueHtml() {
-    switch (true) {
-      case this.playerPlayedBothHands:
-        return `${this.hand2Value}`;
-
-      case this.splitedCards:
-        return `${this.hand1Value}`;
-      default:
-        return `${this.handValue}`;
-    }
+  hasSplitCards() {
+    return this.playHand.hasSplitCards;
   }
 
-  renderHandValue() {
-    const sumContainer = document
-      .querySelector(`#${this.name}`)
-      .querySelector(".player__hand-value");
-    sumContainer.innerHTML = this.playerHandValueHtml();
-  }
-
-  receiveCard(card) {
-    this.hand.push(card);
-    this.renderNextCard();
-    this.sumOfCards();
-    this.renderHandValue();
-  }
-
-  receiveCardforSplittedHand(card) {
-    if (this.playerPlayedBothHands) {
-      this.secondHand.push(card);
-    } else {
-      this.hand.push(card);
-    }
-    this.renderCardWhenPlayerHasSplitted();
-    this.sumOfCards();
-    this.renderHandValueWhenPlayerHasSplitted();
-  }
-
-  // receiveCardforHand2(card) {
-  //   this.secondHand.push(card);
-  // }
-
-  renderHandValueWhenPlayerHasSplitted() {
-    const sumContainer = document.querySelector(
-      `#${this.name} .card.active .player__hand-value`
-    );
-    sumContainer.innerHTML = this.playerHandValueHtml();
-  }
-
-  renderCardWhenPlayerHasSplitted() {
-    let cardToRender;
-    if (this.playerPlayedBothHands) {
-      cardToRender = this.secondHand[this.nextCardToRenderHand2];
-    } else {
-      cardToRender = this.hand[this.nextCardToRenderHand1];
-    }
-    let htmlString = `<p>${cardToRender.number} of ${cardToRender.suit} <i class="${cardToRender.icon}  "></i></p>`;
-
-    const cardContainerElem = document.querySelector(".card.active");
-    cardContainerElem.insertAdjacentHTML("afterbegin", htmlString);
-    if (this.playerPlayedBothHands) {
-      this.nextCardToRenderHand2++;
-    } else {
-      this.nextCardToRenderHand1++;
-    }
-  }
-
-  renderNextCard() {
-    if (this.nextCardToRender > this.hand.length - 1) return;
-    let htmlString = "";
-    const cardToRender = this.hand[this.nextCardToRender];
-    if (cardToRender.faceDirection === "down") {
-      htmlString = '<p id="hidden">Card down</p>';
-    } else {
-      htmlString += `<p>${cardToRender.number} of ${cardToRender.suit} <i class="${cardToRender.icon}  "></i></p>`;
-    }
-    const cardContainerElem = this.domElement.querySelector(".card");
-    cardContainerElem.insertAdjacentHTML("afterbegin", htmlString);
-    this.nextCardToRender++;
+  removePlayerHandControls() {
+    this.playHand.removePlayerHandControls();
   }
 
   secondDealerCard() {

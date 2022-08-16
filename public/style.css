@@ -164,7 +164,7 @@ body {
   border-radius: 0.5rem;
 }
 
-.hidden {
+.hidden-card {
   visibility: hidden;
   opacity: 0;
 }

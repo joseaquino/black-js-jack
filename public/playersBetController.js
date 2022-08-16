@@ -1,10 +1,11 @@
 "use strict";
-export default class playersBetController {
+export default class PlayersBetController {
   constructor(board) {
     this.currentPlayerTurn = 0;
     this.board = board;
     this.currentBet = 0;
-    this.controlsContainerEle = document.querySelector("#game");
+
+    this.controlsContainerEle = this.board.boardContainerElem;
   }
 
   //Each player must place their bet before the cards are dealt
@@ -17,16 +18,13 @@ export default class playersBetController {
     <div class='bet-controls'>
         <div class='bet-controls__pot'>Pot: ${this.activePlayer.pot}</div>
         <div class='bet-controls__bet'>Current bet: ${this.currentBet}</div>    
-        <button type='button' class= 'bet-controls__btn btn--skip' disabled>
-        Skip
-        </button>
-        <button type='button' class= 'bet-controls__btn btn--25'>
+        <button data-amount="25" type='button' class= 'bet-controls__btn btn--25'>
         25
         </button>
-        <button type='button' class= 'bet-controls__btn btn--50'>
+        <button data-amount="50" type='button' class= 'bet-controls__btn btn--50'>
         50
         </button>
-        <button type='button' class= 'bet-controls__btn btn--100'>
+        <button data-amount="100" type='button' class= 'bet-controls__btn btn--100'>
         100
         </button>    
         <button type='button' disabled class= 'bet-controls__btn btn--clear'>
@@ -39,7 +37,7 @@ export default class playersBetController {
       `;
   }
 
-  rederBetControls() {
+  renderBetControls() {
     this.controlsContainerEle.insertAdjacentHTML(
       "beforeend",
       this.controlsHtml()
@@ -48,12 +46,9 @@ export default class playersBetController {
 
   initBetController() {
     this.initPlayers();
-    this.rederBetControls();
+    this.renderBetControls();
     this.selectDomElements();
     this.addEventListeners();
-    if (this.isSafeBetRound()) {
-      this.skip.removeAttribute("disabled");
-    }
   }
 
   initPlayers() {
@@ -62,11 +57,9 @@ export default class playersBetController {
   }
 
   selectDomElements() {
-    this.betControls = document.querySelector(".bet-controls");
-    this.skip = document.querySelector(".btn--skip");
-    this.bet25 = this.controlsContainerEle.querySelector(".btn--25");
-    this.bet50 = this.controlsContainerEle.querySelector(".btn--50");
-    this.bet100 = this.controlsContainerEle.querySelector(".btn--100");
+    this.betControls =
+      this.board.boardContainerElem.querySelector(".bet-controls");
+    this.betButtons = this.betControls.querySelectorAll("[data-amount]");
     this.clear = this.controlsContainerEle.querySelector(".btn--clear");
     this.currentPotCont =
       this.controlsContainerEle.querySelector(".bet-controls__pot");
@@ -76,19 +69,14 @@ export default class playersBetController {
   }
 
   addEventListeners() {
-    this.skip.addEventListener("click", this.skipping);
-    this.bet25.addEventListener("click", this.betting.bind(this));
-    this.bet50.addEventListener("click", this.betting.bind(this));
-    this.bet100.addEventListener("click", this.betting.bind(this));
+    this.addEventListenerToBetButtons();
     this.clear.addEventListener("click", this.clearBet.bind(this));
     this.confirm.addEventListener("click", this.confirmBet.bind(this));
   }
 
   updateActivePlayer() {
     this.activePlayer = this.players[this.currentPlayerTurn];
-    document
-      .querySelector(`#${this.activePlayer.name} .card`)
-      .classList.add("active");
+    this.activePlayer.addFocus();
   }
 
   isLastPlayerTurn() {
@@ -97,17 +85,10 @@ export default class playersBetController {
   }
 
   nextPlayer() {
-    document
-      .querySelector(`#${this.activePlayer.name} .card`)
-      .classList.remove("active");
+    this.activePlayer.removeFocus();
     if (this.isLastPlayerTurn()) {
       this.betControls.remove();
-      if (this.isSafeBetRound()) {
-        this.board.safeBetHasFinished = true;
-      }
-      this.currentPlayerTurn = 0;
-
-      this.board.sartWithGameDealing();
+      this.board.startWithGameDealing();
     } else {
       this.currentPlayerTurn++;
       this.updateActivePlayer();
@@ -116,20 +97,26 @@ export default class playersBetController {
     }
   }
 
-  betting(e) {
+  placeBet(e) {
     this.clear.disabled = false;
     this.confirm.disabled = false;
     const betAddition = e.target.innerText;
+
     if (this.activePlayer.pot - betAddition < 0) {
       return;
     }
-    this.activePlayer.pot -= betAddition;
-    this.currentBet += 1 * betAddition;
+
+    this.activePlayer.removeFromPot(betAddition);
+    this.currentBet += Number(betAddition);
     this.currentPotCont.innerHTML = `Pot: ${this.activePlayer.pot}`;
     this.curretBetCont.innerHTML = `Current bet: ${this.currentBet}`;
+
+    this.disablingBetButtons();
   }
 
   clearBet() {
+    this.enableBetButtons();
+
     this.clear.disabled = true;
     this.confirm.disabled = true;
     this.activePlayer.pot += this.currentBet;
@@ -139,35 +126,29 @@ export default class playersBetController {
   }
 
   confirmBet() {
+    this.enableBetButtons();
     this.clear.disabled = true;
     this.confirm.disabled = true;
-    let playerHtmlCont = document.querySelector(
-      `#${this.activePlayer.name} .player__bet-value`
-    );
-
-    if (this.isSafeBetRound()) {
-      playerHtmlCont.insertAdjacentHTML(
-        "afterend",
-        `Safe Bet: ${this.currentBet}`
-      );
-    } else {
-      playerHtmlCont.insertAdjacentHTML(
-        "afterbegin",
-        `Betting: ${this.currentBet}`
-      );
-    }
-
+    this.activePlayer.renderBetValue(this.currentBet);
     this.currentBet = 0;
     this.nextPlayer();
   }
 
-  isSafeBetRound() {
-    return this.board.hasDealerHaveAnAce();
+  addEventListenerToBetButtons() {
+    this.betButtons.forEach((button) =>
+      button.addEventListener("click", this.placeBet.bind(this))
+    );
   }
 
-  skipping = () => {
-    this.clear.disabled = true;
-    this.confirm.disabled = true;
-    this.nextPlayer();
-  };
+  enableBetButtons() {
+    this.betButtons.forEach((button) => button.removeAttribute("disabled"));
+  }
+
+  disablingBetButtons() {
+    this.betButtons.forEach((button) => {
+      if (this.activePlayer.pot < Number(button.getAttribute("data-amount"))) {
+        button.setAttribute("disabled", "true");
+      }
+    });
+  }
 }
